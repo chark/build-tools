@@ -3,7 +3,7 @@
 [![Unity 2022.3+](https://img.shields.io/badge/unity-2022.3%2B-blue.svg)](https://unity3d.com/get-unity/download)
 [![Actions Status](https://github.com/chark/build-tools/workflows/CI/badge.svg)](https://github.com/chark/build-tools/actions)
 
-Editor utilities for quickly automating builds.
+Editor utilities for quickly automating builds by utilizing Scriptable Objects.
 
 <p align="center">
   <img src="screenshot.png"/>
