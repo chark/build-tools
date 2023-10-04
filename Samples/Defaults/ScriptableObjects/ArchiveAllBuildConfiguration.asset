@@ -12,11 +12,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e8d2cb70b1df4848be5d78abadd43e6b, type: 3}
   m_Name: ArchiveAllBuildConfiguration
   m_EditorClassIdentifier: 
-  configurationName: 
+  configurationName: Build & Archive All
   isDevelopmentBuild: 0
   isShowBuiltPlayer: 1
   isAutoRunPlayer: 0
-  buildTargets: 01000000
+  buildTargets: 0100000002000000
   buildDirectory: Builds
   archiveDirectory: Builds
   buildNameOverride: 
@@ -24,9 +24,9 @@ MonoBehaviour:
   buildNameDelimiter: ' '
   buildDateTimeFormat: yyyyMMHHmm
   isAppendVersionToBuildName: 1
-  isAppendPlatformToBuildName: 1
-  isAppendDateToBuildName: 1
-  isArchive: 0
+  isAppendPlatformToBuildName: 0
+  isAppendDateToBuildName: 0
+  isArchive: 1
   isAppendVersionToArchiveName: 1
   isAppendPlatformToArchiveName: 1
   isAppendDateToArchiveName: 1
