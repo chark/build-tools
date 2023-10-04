@@ -38,4 +38,4 @@ To create a [Build Configuration] asset, right-click anywhere in the _Project Wi
   <img width="50%" src="build-configuration.png"/>
 </p>
 
-You can customize this configuration depending on your needs.
+You can customize this configuration depending on your needs. However, over field to see tooltips for explanations.
