@@ -13,3 +13,4 @@ Initial preview version.
 
 - `BuildConfiguration` Scriptable Object type which can be used to store build configs.
 - `BuildToolsManagerWindow` which can be used to trigger builds.
+- Documentation.
