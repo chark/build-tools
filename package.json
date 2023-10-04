@@ -1,0 +1,27 @@
+{
+  "name": "com.chark.build-tools",
+  "displayName": "Build Tools",
+  "author": {
+    "name": "CHARK",
+    "url": "https://chark.io"
+  },
+  "version": "0.0.1",
+  "unity": "2022.3",
+  "description": "Editor utilities for quickly automating builds",
+  "keywords": [
+    "unity",
+    "editor",
+    "builds",
+	"automation"
+  ],
+  "samples": [
+    {
+      "displayName": "Defaults",
+      "description": "Set of build configurations to be used as a starting point.",
+      "path": "Samples~/Defaults"
+    }
+  ],
+  "dependencies": {
+    "com.unity.sharp-zip-lib": "1.3.2-preview"
+  }
+}
