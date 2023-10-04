@@ -15,7 +15,8 @@ Editor utilities for quickly automating builds by utilizing Scriptable Objects.
 
 - Quickly create build configurations via Scriptable Objects
 - Run multiple builds in sequence
-- Archive support
+- Building archiving
+- Odin Inspector support
 
 ## Installation
 
