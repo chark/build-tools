@@ -1,9 +1,9 @@
-# Scriptable Scenes
+# Build Tools
 
 [![Unity 2022.3+](https://img.shields.io/badge/unity-2022.3%2B-blue.svg)](https://unity3d.com/get-unity/download)
 [![Actions Status](https://github.com/chark/build-tools/workflows/CI/badge.svg)](https://github.com/chark/build-tools/actions)
 
- Editor utilities for quickly automating builds.
+Editor utilities for quickly automating builds.
 
 <p align="center">
   <img src="screenshot.png"/>
@@ -28,7 +28,7 @@ https://github.com/chark/build-tools.git#upm
 Alternatively, manually install by adding the following entry to `Packages/manifest.json`:
 ```json
 {
-  "com.chark.scriptable-scenes": "https://github.com/chark/build-tools.git#upm"
+  "com.chark.build-tools": "https://github.com/chark/build-tools.git#upm"
 }
 ```
 

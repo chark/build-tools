@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      PACKAGE_DIR: Packages/com.chark.scriptable-scenes
+      PACKAGE_DIR: Packages/com.chark.build-tools
       SAMPLE_SRC_DIR: Samples
       SAMPLE_DST_DIR: Samples~
 
