@@ -8,3 +8,8 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ## [v0.0.1](https://github.com/chark/build-tools/compare/v0.0.1) - 2023-10-05
 
 Initial preview version.
+
+### Added
+
+- `BuildConfiguration` Scriptable Object type which can be used to store build configs.
+- `BuildToolsManagerWindow` which can be used to trigger builds.

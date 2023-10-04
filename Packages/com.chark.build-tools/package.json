@@ -7,12 +7,12 @@
   },
   "version": "0.0.1",
   "unity": "2022.3",
-  "description": "Editor utilities for quickly automating builds",
+  "description": "Editor utilities for quickly automating builds by utilizing Scriptable Objects.",
   "keywords": [
     "unity",
     "editor",
     "builds",
-	"automation"
+    "automation"
   ],
   "samples": [
     {
