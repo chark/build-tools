@@ -8,7 +8,7 @@
 
 # Documentation
 
-This package provides a set of editor utilities to quickly create builds locally. It allows to build multiple platforms in one click and by ensuring that the naming of the builds is consistent. Additionally, the resulting builds can be automatically started or archived.
+This package provides a set of editor utilities to quickly create builds locally. It allows to build multiple platforms in one click by also ensuring that the naming of the builds is consistent. Additionally, the resulting builds can be automatically started or archived.
 
 ## Getting Started
 
