@@ -1,0 +1,74 @@
+﻿/* Window content */
+VisualElement.window-content {
+  padding: 4px;
+}
+
+/* General list styling */
+BuildConfigurationList VisualElement.unity-list-view__reorderable-handle {
+  /* Center drag handle */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+
+  padding-top: 0;
+}
+
+BuildConfigurationList VisualElement.unity-list-view__reorderable-item__container {
+  /* Fix weird padding added to each item */
+  padding-left: 0;
+  padding-right: 0;
+}
+
+BuildConfigurationList Toggle.unity-foldout__toggle {
+  /* Fix foldout toggles having inconsistent margins */
+  margin: 2px;
+}
+
+BuildConfigurationList Toggle.unity-foldout__toggle VisualElement.unity-foldout__input {
+  /* Shrink labels - actions take precedence */
+  flex-shrink: 1;
+}
+
+BuildConfigurationList Toggle.unity-foldout__toggle Label.unity-foldout__text {
+  /* General label styling in foldouts */
+  -unity-text-align: middle-left;
+  -unity-font-style: bold;
+}
+
+/* Foldout actions styling */
+BuildConfigurationFoldoutActions {
+  margin-left: auto;
+
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-end;
+
+  flex-shrink: 0;
+  height: 100%;
+}
+
+BuildConfigurationFoldoutActions Button {
+  min-width: 20px;
+  width: 45px;
+
+  padding: 1px;
+  margin: 1px;
+}
+
+/* Foldout content styling (adjust responsive sizing a bit) */
+BuildConfigurationFoldoutContent > * > Label {
+  min-width: 0;
+  width: 135px;
+
+  overflow: hidden;
+  flex-shrink: 1;
+}
+
+BuildConfigurationFoldoutContent > * > VisualElement {
+  min-width: 140px;
+}
+
+BuildConfigurationFoldoutContent ObjectField.readonly ObjectFieldSelector {
+  display: none;
+}
