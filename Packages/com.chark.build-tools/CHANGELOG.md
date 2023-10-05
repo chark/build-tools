@@ -10,7 +10,7 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ## Changed
 
 - Menu item order to use `150` instead of `-1000`. This way `CHARK` won't dominate existing entries.
-- 
+
 ## [v0.0.1](https://github.com/chark/build-tools/compare/v0.0.1) - 2023-10-04
 
 Initial preview version.
