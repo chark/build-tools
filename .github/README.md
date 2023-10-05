@@ -40,4 +40,3 @@ If you'd like to install a specific release, replace `upm` suffix with version n
 - [Documentation](../Packages/com.chark.build-tools/Documentation~/README.md)
 - [Contributing](CONTRIBUTING.md)
 - [Changelog](../Packages/com.chark.build-tools/CHANGELOG.md)
-- [License](../Packages/com.chark.build-tools/LICENSE.md)
