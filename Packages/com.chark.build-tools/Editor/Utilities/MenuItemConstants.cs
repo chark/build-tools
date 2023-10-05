@@ -10,6 +10,6 @@
         /// <summary>
         /// Base menu item priority for Window menu items.
         /// </summary>
-        internal const int BaseWindowPriority = -1000;
+        internal const int BaseWindowPriority = 150;
     }
 }
