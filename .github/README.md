@@ -1,6 +1,7 @@
 # Build Tools
 
 [![Unity 2022.3+](https://img.shields.io/badge/unity-2022.3%2B-blue.svg)](https://unity3d.com/get-unity/download)
+[![openupm](https://img.shields.io/npm/v/com.chark.build-tools?label=openupm&registry_uri=https://package.openupm.com)](https://openupm.com/packages/com.chark.build-tools/)
 [![Actions Status](https://github.com/chark/build-tools/workflows/CI/badge.svg)](https://github.com/chark/build-tools/actions)
 
 Editor utilities for quickly automating builds by utilizing Scriptable Objects.
@@ -20,7 +21,12 @@ Editor utilities for quickly automating builds by utilizing Scriptable Objects.
 
 ## Installation
 
-This package can be installed via the Package Manager by [Installing from a Git URL](https://docs.unity3d.com/Manual/upm-ui-giturl.html):
+This package can be installed via [OpenUPM](https://openupm.com/packages/com.chark.build-tools):
+```text
+openupm add com.chark.build-tools
+```
+
+Or via the Unity Package Manager by [Installing from a Git URL](https://docs.unity3d.com/Manual/upm-ui-giturl.html):
 
 ```text
 https://github.com/chark/build-tools.git#upm
