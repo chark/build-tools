@@ -6,6 +6,10 @@ using CHARK.BuildTools.Editor.Steps;
 using CHARK.BuildTools.Editor.Utilities;
 using UnityEngine;
 
+// TODO: validate required and produced variables in Editor
+// TODO: better logging - what kind of variables are being injected?
+// TODO: show only non obsolete enum fields (will need a custom selector MyCustomEnumSelector : OdinSelector)
+// TODO: fix FOO_BAR enum naming for archives (will need a custom selector MyCustomEnumSelector : OdinSelector)
 namespace CHARK.BuildTools.Editor
 {
     /// <summary>
