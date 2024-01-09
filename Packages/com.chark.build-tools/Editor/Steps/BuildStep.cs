@@ -1,4 +1,6 @@
-﻿using CHARK.BuildTools.Editor.Context;
+﻿using System;
+using System.Collections.Generic;
+using CHARK.BuildTools.Editor.Context;
 using UnityEngine;
 
 namespace CHARK.BuildTools.Editor.Steps
@@ -13,6 +15,37 @@ namespace CHARK.BuildTools.Editor.Steps
         /// </summary>
         public string Name => name;
 
+        /// <summary>
+        /// Variables required by this step.
+        /// </summary>
+#if ODIN_INSPECTOR
+        [Sirenix.OdinInspector.FoldoutGroup("Debug")]
+        [Sirenix.OdinInspector.ListDrawerSettings(
+            ShowPaging = false,
+            IsReadOnly = true,
+            ShowFoldout = false
+        )]
+        [Sirenix.OdinInspector.ShowInInspector]
+#endif
+        protected virtual IEnumerable<string> RequiresVariables { get; } = Array.Empty<string>();
+
+        /// <summary>
+        /// Variables produced by this step.
+        /// </summary>
+#if ODIN_INSPECTOR
+        [Sirenix.OdinInspector.FoldoutGroup("Debug")]
+        [Sirenix.OdinInspector.ListDrawerSettings(
+            ShowPaging = false,
+            IsReadOnly = true,
+            ShowFoldout = false
+        )]
+        [Sirenix.OdinInspector.ShowInInspector]
+#endif
+        protected virtual IEnumerable<string> ProducesVariables { get; } = Array.Empty<string>();
+
+        /// <summary>
+        /// Wrapper for <see cref="Execute"/>.
+        /// </summary>
         internal void ExecuteInternal(IBuildContext context)
         {
             Execute(context);

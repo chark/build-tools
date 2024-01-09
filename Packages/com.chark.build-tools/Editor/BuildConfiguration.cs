@@ -33,7 +33,15 @@ namespace CHARK.BuildTools.Editor
         [SerializeField]
         private List<BuildStep> steps = new();
 
-        public int BuildStepCount => steps.Count;
+        /// <summary>
+        /// Enumerable of valid build steps.
+        /// </summary>
+        public IEnumerable<BuildStep> Steps => steps.Select(step => step);
+
+        /// <summary>
+        /// Count of valid build steps.
+        /// </summary>
+        public int BuildStepCount => Steps.Count();
 
         /// <summary>
         /// Build this configuration.
@@ -41,7 +49,7 @@ namespace CHARK.BuildTools.Editor
         public void Build()
         {
             var context = new BuildContext(DateTime.Now);
-            foreach (var step in steps)
+            foreach (var step in Steps)
             {
                 Logging.LogDebug($"Executing step: {step.Name}", this);
                 step.ExecuteInternal(context);
@@ -51,7 +59,7 @@ namespace CHARK.BuildTools.Editor
         /// <summary>
         /// User-friendly configuration name.
         /// </summary>
-        internal string Name
+        public string Name
         {
             get
             {

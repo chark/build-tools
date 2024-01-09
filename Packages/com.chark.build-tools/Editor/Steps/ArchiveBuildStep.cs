@@ -49,12 +49,24 @@ namespace CHARK.BuildTools.Editor.Steps
         [SerializeField]
         private List<string> ignoreFileSuffixes = new();
 
+        protected override IEnumerable<string> RequiresVariables { get; } = new[]
+        {
+            "buildPath",
+        };
+
+        protected override IEnumerable<string> ProducesVariables { get; } = new[]
+        {
+            "archivePath",
+        };
+
         protected override void Execute(IBuildContext context)
         {
             var src = Path.GetDirectoryName(context.GetArtifactPath("buildPath"));
             var dst = context.ReplaceVariables(archivePath);
 
             Archive(src, dst);
+
+            context.AddVariable("archivePath", () => dst);
         }
 
         private void Archive(string sourceDirectoryPath, string destinationFilePath)
