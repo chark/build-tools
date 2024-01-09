@@ -16,6 +16,7 @@ namespace CHARK.BuildTools.Editor.Elements
 
         internal void Bind(BuildConfiguration configuration)
         {
+            buildButton.SetEnabled(configuration.BuildStepCount > 0);
             buildButton.tooltip = $"Build configuration \"{configuration.Name}\"";
         }
 

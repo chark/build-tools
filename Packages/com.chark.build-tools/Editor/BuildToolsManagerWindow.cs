@@ -99,7 +99,7 @@ namespace CHARK.BuildTools.Editor
 
         private static void OnListViewBuildButtonClicked(BuildConfiguration configuration)
         {
-            PlayerBuilder.BuildAndLog(configuration);
+            configuration.Build();
         }
     }
 }
