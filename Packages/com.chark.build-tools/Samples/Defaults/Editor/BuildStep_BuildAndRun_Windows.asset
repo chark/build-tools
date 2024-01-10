@@ -13,6 +13,6 @@ MonoBehaviour:
   m_Name: BuildStep_BuildAndRun_Windows
   m_EditorClassIdentifier: 
   buildTarget: 19
-  buildOptions: 8
+  buildOptions: 12
   buildPath: Builds/{buildTarget}-{buildVersion}-{buildDate}/{buildName}.exe
   dateTimeFormat: yyyyMMHHmmss

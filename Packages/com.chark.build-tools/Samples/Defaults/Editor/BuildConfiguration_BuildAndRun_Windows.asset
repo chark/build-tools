@@ -14,4 +14,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   configurationName: Build & Run Windows
   steps:
-  - {fileID: 11400000, guid: 860e727850b0fc540b61c3290b1e10b1, type: 2}
+  - {fileID: 11400000, guid: a91b85626a4a2314b8141ed71404f1f4, type: 2}
