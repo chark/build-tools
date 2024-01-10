@@ -29,8 +29,13 @@ namespace CHARK.BuildTools.Editor
         private string configurationName;
 
 #if ODIN_INSPECTOR
-        [Sirenix.OdinInspector.FoldoutGroup("General", Expanded = true)]
-        [Sirenix.OdinInspector.ListDrawerSettings(DefaultExpandedState = true, ShowPaging = false)]
+        [Sirenix.OdinInspector.FoldoutGroup("Steps", Expanded = true)]
+        [Sirenix.OdinInspector.HideLabel]
+        [Sirenix.OdinInspector.ListDrawerSettings(
+            DefaultExpandedState = true,
+            ShowFoldout = false,
+            ShowPaging = false
+        )]
 #endif
         [SerializeField]
         private List<BuildStep> steps = new();

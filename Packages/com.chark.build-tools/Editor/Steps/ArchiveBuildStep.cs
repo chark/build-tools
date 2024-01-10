@@ -6,6 +6,7 @@ using CHARK.BuildTools.Editor.Utilities;
 using Unity.SharpZipLib.Core;
 using Unity.SharpZipLib.Zip;
 using Unity.SharpZipLib.Zip.Compression;
+using UnityEditor;
 using UnityEngine;
 
 namespace CHARK.BuildTools.Editor.Steps
@@ -81,13 +82,22 @@ namespace CHARK.BuildTools.Editor.Steps
             var directoryFilter = new ArchiveSuffixFilter(context.ReplaceVariables(ignoreDirectorySuffixes));
             var fileFilter = new ArchiveSuffixFilter(context.ReplaceVariables(ignoreFileSuffixes));
 
-            fastZip.CreateZip(
-                sourceDirectory: sourceDirectoryPath,
-                zipFileName: destinationFilePath,
-                recurse: true,
-                directoryFilter: directoryFilter,
-                fileFilter: fileFilter
-            );
+            EditorUtility.DisplayProgressBar(Name, destinationFilePath, 1f);
+
+            try
+            {
+                fastZip.CreateZip(
+                    sourceDirectory: sourceDirectoryPath,
+                    zipFileName: destinationFilePath,
+                    recurse: true,
+                    directoryFilter: directoryFilter,
+                    fileFilter: fileFilter
+                );
+            }
+            finally
+            {
+                EditorUtility.ClearProgressBar();
+            }
         }
 
         private sealed class ArchiveSuffixFilter : IScanFilter
