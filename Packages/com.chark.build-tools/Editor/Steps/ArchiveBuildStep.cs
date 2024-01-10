@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using CHARK.BuildTools.Editor.Context;
 using CHARK.BuildTools.Editor.Utilities;
 using Unity.SharpZipLib.Core;
@@ -49,27 +50,27 @@ namespace CHARK.BuildTools.Editor.Steps
         [SerializeField]
         private List<string> ignoreFileSuffixes = new();
 
-        protected override IEnumerable<string> RequiresVariables { get; } = new[]
-        {
-            "buildPath",
-        };
-
-        protected override IEnumerable<string> ProducesVariables { get; } = new[]
-        {
-            "archivePath",
-        };
+        protected override IEnumerable<string> ConsumesVariables => GetVariableNames(archivePath)
+            .Append(GetVariableNames(ignoreDirectorySuffixes))
+            .Append(GetVariableNames(ignoreFileSuffixes))
+            .Distinct()
+            .ToList();
 
         protected override void Execute(IBuildContext context)
         {
-            var src = Path.GetDirectoryName(context.GetArtifactPath("buildPath"));
-            var dst = context.ReplaceVariables(archivePath);
+            var artifacts = context.ArtifactPaths.ToList();
+            foreach (var path in artifacts)
+            {
+                var src = Path.GetDirectoryName(path);
+                var dst = context.ReplaceVariables(archivePath);
 
-            Archive(src, dst);
+                Archive(src, dst, context);
 
-            context.AddVariable("archivePath", () => dst);
+                context.AddArtifact(src, dst);
+            }
         }
 
-        private void Archive(string sourceDirectoryPath, string destinationFilePath)
+        private void Archive(string sourceDirectoryPath, string destinationFilePath, IBuildContext context)
         {
             var fastZip = new FastZip
             {
@@ -77,12 +78,15 @@ namespace CHARK.BuildTools.Editor.Steps
                 CompressionLevel = archiveCompressionLevel,
             };
 
+            var directoryFilter = new ArchiveSuffixFilter(context.ReplaceVariables(ignoreDirectorySuffixes));
+            var fileFilter = new ArchiveSuffixFilter(context.ReplaceVariables(ignoreFileSuffixes));
+
             fastZip.CreateZip(
                 sourceDirectory: sourceDirectoryPath,
                 zipFileName: destinationFilePath,
                 recurse: true,
-                directoryFilter: new ArchiveSuffixFilter(ignoreDirectorySuffixes),
-                fileFilter: new ArchiveSuffixFilter(ignoreFileSuffixes)
+                directoryFilter: directoryFilter,
+                fileFilter: fileFilter
             );
         }
 
@@ -90,9 +94,9 @@ namespace CHARK.BuildTools.Editor.Steps
         {
             private readonly ICollection<string> ignoreDirectorySuffixes;
 
-            public ArchiveSuffixFilter(ICollection<string> ignoreDirectorySuffixes)
+            public ArchiveSuffixFilter(IEnumerable<string> ignoreDirectorySuffixes)
             {
-                this.ignoreDirectorySuffixes = ignoreDirectorySuffixes;
+                this.ignoreDirectorySuffixes = ignoreDirectorySuffixes.ToList();
             }
 
             public bool IsMatch(string name)

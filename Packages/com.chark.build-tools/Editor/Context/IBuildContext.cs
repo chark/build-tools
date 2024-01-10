@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace CHARK.BuildTools.Editor.Context
 {
@@ -16,9 +17,18 @@ namespace CHARK.BuildTools.Editor.Context
         public DateTime BuildDateTime { get; }
 
         /// <summary>
-        /// Replace variables (format: <c>{VARIABLE_NAME}</c>) specified in
-        /// <paramref name="template"/>.
+        /// All produced artifact paths.
         /// </summary>
+        public IEnumerable<string> ArtifactPaths { get; }
+
+        /// <returns>
+        /// String with replaced variables specified in <paramref name="templates"/>.
+        /// </returns>
+        public IEnumerable<string> ReplaceVariables(IEnumerable<string> templates);
+
+        /// <returns>
+        /// String with replaced variables specified in <paramref name="template"/>.
+        /// </returns>
         public string ReplaceVariables(string template);
 
         /// <returns>
@@ -47,6 +57,11 @@ namespace CHARK.BuildTools.Editor.Context
         /// Add build variable.
         /// </summary>
         public void AddVariable(string variableName, VariableValueProvider valueProvider);
+
+        /// <summary>
+        /// Add built artifact to context.
+        /// </summary>
+        public void AddArtifact(string artifactPath);
 
         /// <summary>
         /// Add built artifact to context.

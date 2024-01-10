@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text.RegularExpressions;
+using CHARK.BuildTools.Editor.Utilities;
 
 namespace CHARK.BuildTools.Editor.Context
 {
@@ -14,33 +14,31 @@ namespace CHARK.BuildTools.Editor.Context
 
         public DateTime BuildDateTime { get; }
 
-        public IEnumerable<string> Artifacts => artifacts.Values;
+        public IEnumerable<string> ArtifactPaths => artifacts.Values;
 
         public BuildContext(DateTime buildDateTime)
         {
             BuildDateTime = buildDateTime;
         }
 
+        public IEnumerable<string> ReplaceVariables(IEnumerable<string> templates)
+        {
+            return templates.ReplaceVariables(GetVariableValue);
+
+            string GetVariableValue(string variableName)
+            {
+                return GetVariable<object>(variableName).ToString();
+            }
+        }
+
         public string ReplaceVariables(string template)
         {
-            if (string.IsNullOrWhiteSpace(template))
+            return template.ReplaceVariables(GetVariableValue);
+
+            string GetVariableValue(string variableName)
             {
-                throw new ArgumentException("Value cannot be blank or null", nameof(template));
+                return GetVariable<object>(variableName).ToString();
             }
-
-            var result = template.Trim();
-            foreach (var variableName in GetVariableNames(template))
-            {
-                var value = GetVariable<object>(variableName);
-
-                result = result.Replace(
-                    $"{{{variableName}}}",
-                    value.ToString(),
-                    StringComparison.OrdinalIgnoreCase
-                );
-            }
-
-            return result;
         }
 
         public string GetArtifactPath(string artifactName)
@@ -110,6 +108,11 @@ namespace CHARK.BuildTools.Editor.Context
             valueProviders[normalizedName] = valueProvider;
         }
 
+        public void AddArtifact(string artifactPath)
+        {
+            AddArtifact(Guid.NewGuid().ToString(), artifactPath);
+        }
+
         public void AddArtifact(string artifactName, string artifactPath)
         {
             if (string.IsNullOrWhiteSpace(artifactName))
@@ -126,32 +129,6 @@ namespace CHARK.BuildTools.Editor.Context
             var normalizedPath = GetNormalizedPath(artifactPath);
 
             artifacts[normalizedName] = normalizedPath;
-        }
-
-        private static IEnumerable<string> GetVariableNames(string input)
-        {
-            const string pattern = @"\{([^}]+)\}";
-
-            var matches = Regex.Matches(input, pattern);
-            foreach (Match match in matches)
-            {
-                if (match.Success == false)
-                {
-                    continue;
-                }
-
-                var groups = match.Groups;
-                if (groups.Count <= 1)
-                {
-                    continue;
-                }
-
-                var group = groups[1];
-                var value = group.Value;
-                var variableName = GetNormalizedName(value);
-
-                yield return variableName;
-            }
         }
 
         private static string GetNormalizedName(string name)

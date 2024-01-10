@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using CHARK.BuildTools.Editor.Context;
+using CHARK.BuildTools.Editor.Utilities;
 using UnityEngine;
 
 namespace CHARK.BuildTools.Editor.Steps
@@ -27,7 +28,7 @@ namespace CHARK.BuildTools.Editor.Steps
         )]
         [Sirenix.OdinInspector.ShowInInspector]
 #endif
-        protected virtual IEnumerable<string> RequiresVariables { get; } = Array.Empty<string>();
+        protected virtual IEnumerable<string> ConsumesVariables { get; } = Array.Empty<string>();
 
         /// <summary>
         /// Variables produced by this step.
@@ -49,6 +50,22 @@ namespace CHARK.BuildTools.Editor.Steps
         internal void ExecuteInternal(IBuildContext context)
         {
             Execute(context);
+        }
+
+        /// <returns>
+        /// Enumerable of variable names extracted from given <paramref name="templates"/>.
+        /// </returns>
+        protected static IEnumerable<string> GetVariableNames(IEnumerable<string> templates)
+        {
+            return templates.GetVariableNames();
+        }
+
+        /// <returns>
+        /// Enumerable of variable names extracted from given <paramref name="template"/>.
+        /// </returns>
+        protected static IEnumerable<string> GetVariableNames(string template)
+        {
+            return template.GetVariableNames();
         }
 
         /// <summary>

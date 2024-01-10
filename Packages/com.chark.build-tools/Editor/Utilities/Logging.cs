@@ -47,7 +47,7 @@ namespace CHARK.BuildTools.Editor.Utilities
                 : owner.name;
 
 #if UNITY_EDITOR
-            Debug.LogWarning($"[<b><color=orange>{name}</color></b>]: {message}", owner);
+            Debug.LogWarning($"[<b><color=yellow>{name}</color></b>]: {message}", owner);
 #else
             Debug.LogWarning($"[{name}]: {message}", owner);
 #endif

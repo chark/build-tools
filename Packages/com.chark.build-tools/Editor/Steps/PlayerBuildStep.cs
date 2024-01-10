@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using CHARK.BuildTools.Editor.Context;
 using CHARK.BuildTools.Editor.Utilities;
 using UnityEditor;
@@ -52,15 +51,12 @@ namespace CHARK.BuildTools.Editor.Steps
         [SerializeField]
         private string dateTimeFormat = "yyyyMMHHmmss";
 
-        protected override IEnumerable<string> RequiresVariables { get; } = Array.Empty<string>();
-
         protected override IEnumerable<string> ProducesVariables { get; } = new[]
         {
             "buildName",
             "buildVersion",
             "buildDate",
             "buildTarget",
-            "buildPath",
         };
 
         protected override void Execute(IBuildContext context)
@@ -80,7 +76,7 @@ namespace CHARK.BuildTools.Editor.Steps
                 return;
             }
 
-            context.AddArtifact("buildPath", options.locationPathName);
+            context.AddArtifact(options.locationPathName);
         }
 
         private BuildPlayerOptions CreateBuildPlayerOptions(IBuildContext context)
