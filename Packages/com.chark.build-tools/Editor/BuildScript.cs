@@ -40,9 +40,8 @@ namespace CHARK.BuildTools.Editor
                 return;
             }
 
+            // TODO: fails due to SOs being destroyed after build...
             configuration.Build();
         }
-
-
     }
 }
