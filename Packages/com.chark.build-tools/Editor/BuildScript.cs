@@ -41,6 +41,7 @@ namespace CHARK.BuildTools.Editor
             }
 
             // TODO: fails due to SOs being destroyed after build...
+            // TODO: https://forum.unity.com/threads/how-to-keep-in-memory-scriptableobject-alive-after-buildpipeline-buildplayer.848575/
             configuration.Build();
         }
     }
