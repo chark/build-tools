@@ -39,3 +39,20 @@ To create a [Build Configuration] asset, right-click anywhere in the _Project Wi
 </p>
 
 You can customize this configuration depending on your needs. However, over field to see tooltips for explanations.
+
+## Build Script
+
+To run a build via a build script, use the following command:
+```bat
+"C:\Program Files\Unity\Hub\Editor\YOUR_UNITY_VERSION\Editor\Unity.exe"^
+ -batchmode^
+ -quit^
+ -projectPath "YOUR_PROJECT_PATH"^
+ -executeMethod CHARK.BuildTools.Editor.BuildScript.Build^
+ -configurationName "CONFIGURATION_NAME"
+```
+
+Replace:
+- `YOUR_UNITY_VERSION` - Unity version that you're using, e.g., `2022.3.10f1`
+- `YOUR_PROJECT_PATH` - path to the project that you're building, e.g., `C:\Users\FooBar\Projects\build-tools`
+- `CONFIGURATION_NAME` - configuration that you want to build, e.g., `BuildConfiguration_BuildAndArchive_All`
