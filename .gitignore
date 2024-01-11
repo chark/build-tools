@@ -62,4 +62,4 @@ Assets/Plugins/Sirenix
 Assets/Plugins/Sirenix.meta
 
 # Package test scripts
-/test-build.bat
+/test-build.log

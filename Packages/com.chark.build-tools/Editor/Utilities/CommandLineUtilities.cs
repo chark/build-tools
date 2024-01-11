@@ -3,13 +3,34 @@ using System.Collections.Generic;
 
 namespace CHARK.BuildTools.Editor.Utilities
 {
-    internal sealed class CommandLineUtilities
+    internal static class CommandLineUtilities
     {
+        internal sealed class CommandLineArguments
+        {
+            private readonly IDictionary<string, string> arguments;
+
+            public CommandLineArguments(IDictionary<string, string> arguments)
+            {
+                this.arguments = arguments;
+            }
+
+            public bool TryGetValue(string key, out string value)
+            {
+                if (string.IsNullOrWhiteSpace(key))
+                {
+                    throw new ArgumentException("Key cannot be null or blank", nameof(key));
+                }
+
+                var normalizedKey = key.Trim().ToLower();
+                return arguments.TryGetValue(normalizedKey, out value);
+            }
+        }
+
         /// <returns>
         /// Dictionary containing command line arguments passed to
         /// <see cref="Environment.GetCommandLineArgs"/>.
         /// </returns>
-        internal static IDictionary<string, string> GetCommandLineArguments()
+        internal static CommandLineArguments GetCommandLineArguments()
         {
             var commandLineArgs = Environment.GetCommandLineArgs();
             var result = new Dictionary<string, string>();
@@ -17,11 +38,11 @@ namespace CHARK.BuildTools.Editor.Utilities
             for (var index = 0; index < commandLineArgs.Length; index++)
             {
                 var arg = commandLineArgs[index];
-                var key = arg.TrimStart('-');
+                var key = arg.TrimStart('-').Trim().ToLower();
 
                 if (index + 1 < commandLineArgs.Length)
                 {
-                    var value = commandLineArgs[index + 1];
+                    var value = commandLineArgs[index + 1].Trim();
                     if (value.StartsWith("-") == false)
                     {
                         result[key] = value;
@@ -35,7 +56,7 @@ namespace CHARK.BuildTools.Editor.Utilities
                 result[key] = "true";
             }
 
-            return result;
+            return new CommandLineArguments(result);
         }
     }
 }
