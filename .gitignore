@@ -60,3 +60,6 @@ InitTestScene*.unity.meta
 # Odin Inspector (used for testing)
 Assets/Plugins/Sirenix
 Assets/Plugins/Sirenix.meta
+
+# Package test scripts
+/test-build.bat
