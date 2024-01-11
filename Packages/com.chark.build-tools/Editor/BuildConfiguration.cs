@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using CHARK.BuildTools.Editor.Context;
 using CHARK.BuildTools.Editor.Steps;
 using CHARK.BuildTools.Editor.Utilities;
 using UnityEngine;
@@ -30,36 +29,52 @@ namespace CHARK.BuildTools.Editor
 
 #if ODIN_INSPECTOR
         [Sirenix.OdinInspector.FoldoutGroup("Steps", Expanded = true)]
-        [Sirenix.OdinInspector.HideLabel]
         [Sirenix.OdinInspector.ListDrawerSettings(
             DefaultExpandedState = true,
             ShowFoldout = false,
-            ShowPaging = false
+            ShowPaging = false,
+            ListElementLabelName = nameof(BuildStep.Name)
         )]
 #endif
-        [SerializeField]
+        [SerializeReference]
         private List<BuildStep> steps = new();
 
         /// <summary>
         /// Enumerable of valid build steps.
         /// </summary>
-        public IEnumerable<BuildStep> Steps => steps.Select(step => step);
+        public IEnumerable<BuildStep> Steps => steps.Where(step => step != default);
 
         /// <summary>
         /// Count of valid build steps.
         /// </summary>
         public int BuildStepCount => Steps.Count();
 
+        private void OnValidate()
+        {
+            InitializeSteps();
+        }
+
+        private void OnEnable()
+        {
+            InitializeSteps();
+        }
+
+        private void OnDisable()
+        {
+            InitializeSteps();
+        }
+
         /// <summary>
         /// Build this configuration.
         /// </summary>
         public void Build()
         {
-            var context = new BuildContext(DateTime.Now);
+            var context = new BuildContext(DateTime.Now, Steps);
             foreach (var step in Steps)
             {
                 Logging.LogDebug($"Executing step: {step.Name}", this);
-                step.ExecuteInternal(context);
+                step.Initialize(context);
+                step.Execute();
             }
         }
 
@@ -81,15 +96,24 @@ namespace CHARK.BuildTools.Editor
 
         private string GetDefaultName()
         {
-            if (steps.Count <= 0)
+            if (BuildStepCount <= 0)
             {
                 return name;
             }
 
-            var stepNames = steps.Select(step => step.Name);
+            var stepNames = Steps.Select(step => step.Name);
             var stepStr = string.Join(", ", stepNames);
 
             return $"{name}: {stepStr}";
+        }
+
+        private void InitializeSteps()
+        {
+            var context = new BuildContext(DateTime.Now, Steps);
+            foreach (var step in Steps)
+            {
+                step.Initialize(context);
+            }
         }
     }
 }

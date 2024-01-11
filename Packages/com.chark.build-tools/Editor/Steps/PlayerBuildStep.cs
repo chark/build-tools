@@ -1,5 +1,5 @@
-﻿using System.Collections.Generic;
-using CHARK.BuildTools.Editor.Context;
+﻿using System;
+using System.Collections.Generic;
 using CHARK.BuildTools.Editor.Utilities;
 using UnityEditor;
 using UnityEditor.Build.Reporting;
@@ -7,11 +7,7 @@ using UnityEngine;
 
 namespace CHARK.BuildTools.Editor.Steps
 {
-    [CreateAssetMenu(
-        fileName = CreateAssetMenuConstants.BaseFileName + nameof(PlayerBuildStep),
-        menuName = CreateAssetMenuConstants.BaseMenuName + "/Steps/Player Build Step",
-        order = CreateAssetMenuConstants.BaseOrder
-    )]
+    [Serializable]
     internal sealed class PlayerBuildStep : BuildStep
     {
 #if ODIN_INSPECTOR
@@ -24,15 +20,13 @@ namespace CHARK.BuildTools.Editor.Steps
         [Header("Build")]
 #endif
         [SerializeField]
-        private BuildTarget buildTarget = BuildTarget.StandaloneWindows64;
+        private BuildTarget buildTarget = BuildTarget.NoTarget;
 
 #if ODIN_INSPECTOR
         [Sirenix.OdinInspector.FoldoutGroup("Build", Expanded = true)]
 #endif
         [SerializeField]
-        private BuildOptions buildOptions = BuildOptions.None
-            | BuildOptions.ShowBuiltPlayer
-            | BuildOptions.AutoRunPlayer;
+        private BuildOptions buildOptions = BuildOptions.None;
 
 #if ODIN_INSPECTOR
         [Sirenix.OdinInspector.FoldoutGroup("Paths", Expanded = true)]
@@ -59,14 +53,14 @@ namespace CHARK.BuildTools.Editor.Steps
             "buildTarget",
         };
 
-        protected override void Execute(IBuildContext context)
+        public override void Execute()
         {
-            context.AddVariable("buildName", () => Application.productName);
-            context.AddVariable("buildVersion", () => Application.version);
-            context.AddVariable("buildDate", () => context.BuildDateTime.ToString(dateTimeFormat));
-            context.AddVariable("buildTarget", () => buildTarget.ToString());
+            AddVariable("buildName", Application.productName);
+            AddVariable("buildVersion", Application.version);
+            AddVariable("buildDate", BuildDateTime.ToString(dateTimeFormat));
+            AddVariable("buildTarget", buildTarget.ToString());
 
-            var options = CreateBuildPlayerOptions(context);
+            var options = CreateBuildPlayerOptions();
             var report = BuildPipeline.BuildPlayer(options);
 
             LogBuildReport(report);
@@ -76,15 +70,15 @@ namespace CHARK.BuildTools.Editor.Steps
                 return;
             }
 
-            context.AddArtifact(options.locationPathName);
+            AddArtifact(options.locationPathName);
         }
 
-        private BuildPlayerOptions CreateBuildPlayerOptions(IBuildContext context)
+        private BuildPlayerOptions CreateBuildPlayerOptions()
         {
             return new BuildPlayerOptions
             {
                 scenes = GetEnabledScenePaths(),
-                locationPathName = GetBuildPath(context),
+                locationPathName = ReplaceVariables(buildPath),
                 options = buildOptions,
                 target = buildTarget,
             };
@@ -109,11 +103,6 @@ namespace CHARK.BuildTools.Editor.Steps
             return scenePaths.ToArray();
         }
 
-        private string GetBuildPath(IBuildContext context)
-        {
-            return context.ReplaceVariables(buildPath);
-        }
-
         private void LogBuildReport(BuildReport report)
         {
             var summary = report.summary;
@@ -132,11 +121,11 @@ namespace CHARK.BuildTools.Editor.Steps
 
             if (summary.totalErrors > 0)
             {
-                Logging.LogError(message, this);
+                Logging.LogError(message, GetType());
             }
             else
             {
-                Logging.LogDebug(message, this);
+                Logging.LogDebug(message, GetType());
             }
         }
 

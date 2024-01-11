@@ -18,7 +18,10 @@ namespace CHARK.BuildTools.Editor.Utilities
             {
                 if (string.IsNullOrWhiteSpace(key))
                 {
-                    throw new ArgumentException("Key cannot be null or blank", nameof(key));
+                    throw new ArgumentException(
+                        $"{key} cannot be null or blank",
+                        nameof(key)
+                    );
                 }
 
                 var normalizedKey = key.Trim().ToLower();

@@ -1,7 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using CHARK.BuildTools.Editor.Context;
 using CHARK.BuildTools.Editor.Utilities;
 using Unity.SharpZipLib.Core;
 using Unity.SharpZipLib.Zip;
@@ -11,11 +11,7 @@ using UnityEngine;
 
 namespace CHARK.BuildTools.Editor.Steps
 {
-    [CreateAssetMenu(
-        fileName = CreateAssetMenuConstants.BaseFileName + nameof(ArchiveBuildStep),
-        menuName = CreateAssetMenuConstants.BaseMenuName + "/Steps/Archive Build Step",
-        order = CreateAssetMenuConstants.BaseOrder
-    )]
+    [Serializable]
     internal sealed class ArchiveBuildStep : BuildStep
     {
 #if ODIN_INSPECTOR
@@ -29,10 +25,20 @@ namespace CHARK.BuildTools.Editor.Steps
 #if ODIN_INSPECTOR
         [Sirenix.OdinInspector.FoldoutGroup("Archive", Expanded = true)]
         [Sirenix.OdinInspector.Required]
+        [Sirenix.OdinInspector.ValueDropdown(
+            nameof(BuildStepNames)
+        )]
+#endif
+        [SerializeField]
+        private List<string> archiveBuildStepNames = new();
+
+#if ODIN_INSPECTOR
+        [Sirenix.OdinInspector.FoldoutGroup("Archive", Expanded = true)]
+        [Sirenix.OdinInspector.Required]
         [Sirenix.OdinInspector.FolderPath]
 #endif
         [SerializeField]
-        private string archivePath = "Builds/{buildName}-{buildVersion}.zip";
+        private string archivePath = "Builds/{buildTarget}-{buildVersion}-{buildDate}.zip";
 
 #if ODIN_INSPECTOR
         [Sirenix.OdinInspector.FoldoutGroup("Filtering", Expanded = true)]
@@ -57,21 +63,23 @@ namespace CHARK.BuildTools.Editor.Steps
             .Distinct()
             .ToList();
 
-        protected override void Execute(IBuildContext context)
+        public override void Execute()
         {
-            var artifacts = context.ArtifactPaths.ToList();
+            // TODO: get build step for each build step name
+            // TODO: replace variables using that build step (prolly need to relax replacement)
+            var artifacts = GetArtifactPaths(Array.Empty<IBuildStep>()).ToList(); // TODO: names
             foreach (var path in artifacts)
             {
                 var src = Path.GetDirectoryName(path);
-                var dst = context.ReplaceVariables(archivePath);
+                var dst = ReplaceVariables(archivePath);
 
-                Archive(src, dst, context);
+                Archive(src, dst);
 
-                context.AddArtifact(src, dst);
+                AddArtifact(src, dst);
             }
         }
 
-        private void Archive(string sourceDirectoryPath, string destinationFilePath, IBuildContext context)
+        private void Archive(string sourceDirectoryPath, string destinationFilePath)
         {
             var fastZip = new FastZip
             {
@@ -79,8 +87,8 @@ namespace CHARK.BuildTools.Editor.Steps
                 CompressionLevel = archiveCompressionLevel,
             };
 
-            var directoryFilter = new ArchiveSuffixFilter(context.ReplaceVariables(ignoreDirectorySuffixes));
-            var fileFilter = new ArchiveSuffixFilter(context.ReplaceVariables(ignoreFileSuffixes));
+            var directoryFilter = new ArchiveSuffixFilter(ReplaceVariables(ignoreDirectorySuffixes));
+            var fileFilter = new ArchiveSuffixFilter(ReplaceVariables(ignoreFileSuffixes));
 
             EditorUtility.DisplayProgressBar(Name, destinationFilePath, 1f);
 

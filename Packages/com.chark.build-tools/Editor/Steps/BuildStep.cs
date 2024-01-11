@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using CHARK.BuildTools.Editor.Context;
+using System.Linq;
 using CHARK.BuildTools.Editor.Utilities;
 using UnityEngine;
 
@@ -9,12 +9,35 @@ namespace CHARK.BuildTools.Editor.Steps
     /// <summary>
     /// Generic build step.
     /// </summary>
-    public abstract class BuildStep : ScriptableObject
+    [Serializable]
+    public abstract class BuildStep : IBuildStep
     {
-        /// <summary>
-        /// Name of this build step.
-        /// </summary>
+#if ODIN_INSPECTOR
+        [Sirenix.OdinInspector.FoldoutGroup("Build Step", Expanded = true)]
+        [Sirenix.OdinInspector.Required]
+#else
+        [Header("Build Step")]
+#endif
+        [SerializeField]
+        private string name = Guid.NewGuid().ToString();
+
         public string Name => name;
+
+        public IEnumerable<string> BuildStepNames
+        {
+            get
+            {
+                if (context == default)
+                {
+                    return Array.Empty<string>();
+                }
+
+                return context
+                    .BuildSteps
+                    .Where(buildStep => buildStep != this)
+                    .Select(buildStep => buildStep.Name);
+            }
+        }
 
         /// <summary>
         /// Variables required by this step.
@@ -44,33 +67,76 @@ namespace CHARK.BuildTools.Editor.Steps
 #endif
         protected virtual IEnumerable<string> ProducesVariables { get; } = Array.Empty<string>();
 
-        /// <summary>
-        /// Wrapper for <see cref="Execute"/>.
-        /// </summary>
-        internal void ExecuteInternal(IBuildContext context)
+        public DateTime BuildDateTime => context?.BuildDateTime ?? DateTime.Now;
+
+        private BuildContext context;
+
+        internal void Initialize(BuildContext buildContext)
         {
-            Execute(context);
+            context = buildContext;
         }
 
-        /// <returns>
-        /// Enumerable of variable names extracted from given <paramref name="templates"/>.
-        /// </returns>
-        protected static IEnumerable<string> GetVariableNames(IEnumerable<string> templates, bool isNormalize = true)
+        public IEnumerable<IBuildStep> GetBuildSteps(IEnumerable<string> buildStepNames)
+        {
+            if (context == default)
+            {
+                yield break;
+            }
+
+            foreach (var buildStepName in buildStepNames)
+            {
+                if (context.TryGetBuildStep(buildStepName, out var buildStep))
+                {
+                    yield return buildStep;
+                }
+            }
+        }
+
+        public IEnumerable<string> GetArtifactPaths(IEnumerable<IBuildStep> buildSteps)
+        {
+            return buildSteps.SelectMany(GetArtifactPaths);
+        }
+
+        public IEnumerable<string> GetArtifactPaths(IBuildStep buildStep)
+        {
+            return context?.GetArtifactPaths(buildStep) ?? Array.Empty<string>();
+        }
+
+        public void AddVariable(string variableName, object variableValue)
+        {
+            context?.AddVariable(variableName, variableValue);
+        }
+
+        public void AddArtifact(string artifactPath)
+        {
+            AddArtifact(Guid.NewGuid().ToString(), artifactPath);
+        }
+
+        public void AddArtifact(string artifactName, string artifactPath)
+        {
+            context?.AddArtifact(this, artifactName, artifactPath);
+        }
+
+        public IEnumerable<string> ReplaceVariables(IEnumerable<string> templates)
+        {
+            return context?.ReplaceVariables(templates) ?? Array.Empty<string>();
+        }
+
+        public string ReplaceVariables(string template)
+        {
+            return context?.ReplaceVariables(template) ?? template;
+        }
+
+        public IEnumerable<string> GetVariableNames(IEnumerable<string> templates, bool isNormalize = true)
         {
             return templates.GetVariableNames(isNormalize: isNormalize);
         }
 
-        /// <returns>
-        /// Enumerable of variable names extracted from given <paramref name="template"/>.
-        /// </returns>
-        protected static IEnumerable<string> GetVariableNames(string template, bool isNormalize = true)
+        public IEnumerable<string> GetVariableNames(string template, bool isNormalize = true)
         {
             return template.GetVariableNames(isNormalize: isNormalize);
         }
 
-        /// <summary>
-        /// Execute this build step using provided <paramref name="context"/>.
-        /// </summary>
-        protected abstract void Execute(IBuildContext context);
+        public abstract void Execute();
     }
 }
