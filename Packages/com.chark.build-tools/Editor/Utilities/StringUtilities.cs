@@ -7,16 +7,14 @@ namespace CHARK.BuildTools.Editor.Utilities
 {
     internal static class StringUtilities
     {
-        /// <summary>
+        /// <returns>
         /// Enumerable of variable names extracted from <paramref name="templates"/>.
-        /// </summary>
-        /// <param name="templates"></param>
-        /// <returns></returns>
-        internal static IEnumerable<string> GetVariableNames(this IEnumerable<string> templates)
+        /// </returns>
+        internal static IEnumerable<string> GetVariableNames(this IEnumerable<string> templates, bool isNormalize = true)
         {
             foreach (var template in templates)
             {
-                foreach (var variableName in GetVariableNames(template))
+                foreach (var variableName in GetVariableNames(template, isNormalize: isNormalize))
                 {
                     yield return variableName;
                 }
@@ -26,7 +24,7 @@ namespace CHARK.BuildTools.Editor.Utilities
         /// <returns>
         /// Enumerable of variable names extracted from <paramref name="template"/>.
         /// </returns>
-        internal static IEnumerable<string> GetVariableNames(this string template)
+        internal static IEnumerable<string> GetVariableNames(this string template, bool isNormalize = true)
         {
             if (string.IsNullOrWhiteSpace(template))
             {
@@ -51,7 +49,7 @@ namespace CHARK.BuildTools.Editor.Utilities
 
                 var group = groups[1];
                 var value = group.Value;
-                var variableName = value.ToNormalizedVariableName();
+                var variableName = isNormalize ? value.ToNormalizedVariableName() : value.Trim();
 
                 yield return variableName;
             }

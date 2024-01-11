@@ -2,6 +2,8 @@
 using System.Linq;
 using CHARK.BuildTools.Editor.Utilities;
 using UnityEditor;
+using UnityEngine;
+using Object = UnityEngine.Object;
 
 namespace CHARK.BuildTools.Editor
 {
@@ -40,9 +42,21 @@ namespace CHARK.BuildTools.Editor
                 return;
             }
 
-            // TODO: fails due to SOs being destroyed after build...
-            // TODO: https://forum.unity.com/threads/how-to-keep-in-memory-scriptableobject-alive-after-buildpipeline-buildplayer.848575/
-            configuration.Build();
+            if (Application.isBatchMode)
+            {
+                // Build script fails in batch mode due to Scriptable Objects being destroyed
+                // after BuildPipeline.BuildPlayer is called.
+                //
+                // For more info see:
+                // https://forum.unity.com/threads/how-to-keep-in-memory-scriptableobject-alive-after-buildpipeline-buildplayer.848575/
+                var temporaryConfiguration = Object.Instantiate(configuration);
+                temporaryConfiguration.hideFlags |= HideFlags.DontUnloadUnusedAsset | HideFlags.DontSave;
+                temporaryConfiguration.Build();
+            }
+            else
+            {
+                configuration.Build();
+            }
         }
     }
 }

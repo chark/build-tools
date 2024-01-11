@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: BuildStep_Archive
   m_EditorClassIdentifier: 
   archiveCompressionLevel: 9
-  archivePath: Builds/{buildTarget}-{buildVersion}-{buildDate}.zip
+  archivePath: Builds/{buildName}-{buildVersion}.zip
   ignoreDirectorySuffixes:
   - _BurstDebugInformation_DoNotShip
   ignoreFileSuffixes: []

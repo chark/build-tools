@@ -6,18 +6,33 @@ namespace CHARK.BuildTools.Editor.Context
 {
     internal sealed class BuildContext : IBuildContext
     {
-        private readonly IDictionary<string, IBuildContext.VariableValueProvider> valueProviders =
-            new Dictionary<string, IBuildContext.VariableValueProvider>();
-
-        private readonly IDictionary<string, string> artifacts =
-            new Dictionary<string, string>();
+        private readonly IDictionary<string, IBuildContext.VariableValueProvider> valueProviders;
+        private readonly IDictionary<string, string> artifacts;
+        private readonly IBuildContext parentContext;
 
         public DateTime BuildDateTime { get; }
 
         public IEnumerable<string> ArtifactPaths => artifacts.Values;
 
-        public BuildContext(DateTime buildDateTime)
+        public BuildContext(DateTime buildDateTime) : this(
+            valueProviders: new Dictionary<string, IBuildContext.VariableValueProvider>(),
+            artifacts: new Dictionary<string, string>(),
+            parentContext: null,
+            buildDateTime: buildDateTime
+        )
         {
+        }
+
+        public BuildContext(
+            IDictionary<string, IBuildContext.VariableValueProvider> valueProviders,
+            IDictionary<string, string> artifacts,
+            IBuildContext parentContext,
+            DateTime buildDateTime
+        )
+        {
+            this.valueProviders = valueProviders;
+            this.artifacts = artifacts;
+            this.parentContext = parentContext;
             BuildDateTime = buildDateTime;
         }
 
@@ -139,6 +154,18 @@ namespace CHARK.BuildTools.Editor.Context
         private static string GetNormalizedPath(string path)
         {
             return path.Trim();
+        }
+
+        public object Clone()
+        {
+            var context = new BuildContext(
+                new Dictionary<string, IBuildContext.VariableValueProvider>(valueProviders),
+                new Dictionary<string, string>(artifacts),
+                this,
+                BuildDateTime
+            );
+
+            return context;
         }
     }
 }

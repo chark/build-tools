@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace CHARK.BuildTools.Editor.Context
 {
-    public interface IBuildContext
+    public interface IBuildContext : ICloneable
     {
         /// <summary>
         /// Delegate which provides raw values for <see cref="IBuildContext.TryGetVariable{T}"/> and

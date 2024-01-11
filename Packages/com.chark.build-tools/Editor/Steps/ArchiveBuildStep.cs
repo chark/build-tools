@@ -32,7 +32,7 @@ namespace CHARK.BuildTools.Editor.Steps
         [Sirenix.OdinInspector.FolderPath]
 #endif
         [SerializeField]
-        private string archivePath = "Builds/{buildTarget}-{buildVersion}-{buildDate}.zip";
+        private string archivePath = "Builds/{buildName}-{buildVersion}.zip";
 
 #if ODIN_INSPECTOR
         [Sirenix.OdinInspector.FoldoutGroup("Filtering", Expanded = true)]
@@ -51,9 +51,9 @@ namespace CHARK.BuildTools.Editor.Steps
         [SerializeField]
         private List<string> ignoreFileSuffixes = new();
 
-        protected override IEnumerable<string> ConsumesVariables => GetVariableNames(archivePath)
-            .Append(GetVariableNames(ignoreDirectorySuffixes))
-            .Append(GetVariableNames(ignoreFileSuffixes))
+        protected override IEnumerable<string> ConsumesVariables => GetVariableNames(archivePath, isNormalize: false)
+            .Append(GetVariableNames(ignoreDirectorySuffixes, isNormalize: false))
+            .Append(GetVariableNames(ignoreFileSuffixes, isNormalize: false))
             .Distinct()
             .ToList();
 

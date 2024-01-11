@@ -55,17 +55,17 @@ namespace CHARK.BuildTools.Editor.Steps
         /// <returns>
         /// Enumerable of variable names extracted from given <paramref name="templates"/>.
         /// </returns>
-        protected static IEnumerable<string> GetVariableNames(IEnumerable<string> templates)
+        protected static IEnumerable<string> GetVariableNames(IEnumerable<string> templates, bool isNormalize = true)
         {
-            return templates.GetVariableNames();
+            return templates.GetVariableNames(isNormalize: isNormalize);
         }
 
         /// <returns>
         /// Enumerable of variable names extracted from given <paramref name="template"/>.
         /// </returns>
-        protected static IEnumerable<string> GetVariableNames(string template)
+        protected static IEnumerable<string> GetVariableNames(string template, bool isNormalize = true)
         {
-            return template.GetVariableNames();
+            return template.GetVariableNames(isNormalize: isNormalize);
         }
 
         /// <summary>

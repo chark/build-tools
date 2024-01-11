@@ -11,11 +11,14 @@ namespace CHARK.BuildTools.Editor.Utilities
     {
         internal static void LogDebug(string message, Type owner)
         {
-#if UNITY_EDITOR
-            Debug.Log($"[<b><color=cyan>{owner.Name}</color></b>]: {message}");
-#else
-            Debug.Log($"[{owner.Name}]: {message}");
-#endif
+            if (Application.isBatchMode)
+            {
+                Debug.Log($"[{owner.Name}]: {message}");
+            }
+            else
+            {
+                Debug.Log($"[<b><color=cyan>{owner.Name}</color></b>]: {message}");
+            }
         }
 
         internal static void LogDebug(string message, Object owner)
@@ -24,20 +27,26 @@ namespace CHARK.BuildTools.Editor.Utilities
                 ? owner.GetType().Name
                 : owner.name;
 
-#if UNITY_EDITOR
-            Debug.Log($"[<b><color=cyan>{name}</color></b>]: {message}", owner);
-#else
-            Debug.Log($"[{name}]: {message}", owner);
-#endif
+            if (Application.isBatchMode)
+            {
+                Debug.Log($"[{name}]: {message}", owner);
+            }
+            else
+            {
+                Debug.Log($"[<b><color=cyan>{name}</color></b>]: {message}", owner);
+            }
         }
 
         internal static void LogWarning(string message, Type owner)
         {
-#if UNITY_EDITOR
-            Debug.LogWarning($"[<b><color=yellow>{owner.Name}</color></b>]: {message}");
-#else
-            Debug.LogWarning($"[{owner.Name}]: {message}");
-#endif
+            if (Application.isBatchMode)
+            {
+                Debug.LogWarning($"[{owner.Name}]: {message}");
+            }
+            else
+            {
+                Debug.LogWarning($"[<b><color=yellow>{owner.Name}</color></b>]: {message}");
+            }
         }
 
         internal static void LogWarning(string message, Object owner)
@@ -46,20 +55,26 @@ namespace CHARK.BuildTools.Editor.Utilities
                 ? owner.GetType().Name
                 : owner.name;
 
-#if UNITY_EDITOR
-            Debug.LogWarning($"[<b><color=yellow>{name}</color></b>]: {message}", owner);
-#else
-            Debug.LogWarning($"[{name}]: {message}", owner);
-#endif
+            if (Application.isBatchMode)
+            {
+                Debug.LogWarning($"[{name}]: {message}", owner);
+            }
+            else
+            {
+                Debug.LogWarning($"[<b><color=yellow>{name}</color></b>]: {message}", owner);
+            }
         }
 
         internal static void LogError(string message, Type owner)
         {
-#if UNITY_EDITOR
-            Debug.LogError($"[<b><color=red>{owner.Name}</color></b>]: {message}");
-#else
-            Debug.LogError($"[{owner.Name}]: {message}");
-#endif
+            if (Application.isBatchMode)
+            {
+                Debug.LogError($"[{owner.Name}]: {message}");
+            }
+            else
+            {
+                Debug.LogError($"[<b><color=red>{owner.Name}</color></b>]: {message}");
+            }
         }
 
         internal static void LogError(string message, Object owner)
@@ -68,11 +83,14 @@ namespace CHARK.BuildTools.Editor.Utilities
                 ? owner.GetType().Name
                 : owner.name;
 
-#if UNITY_EDITOR
-            Debug.LogError($"[<b><color=red>{name}</color></b>]: {message}", owner);
-#else
-            Debug.LogError($"[{name}]: {message}", owner);
-#endif
+            if (Application.isBatchMode)
+            {
+                Debug.LogError($"[{name}]: {message}", owner);
+            }
+            else
+            {
+                Debug.LogError($"[<b><color=red>{name}</color></b>]: {message}", owner);
+            }
         }
 
         internal static void LogException(Exception exception, Type owner)
