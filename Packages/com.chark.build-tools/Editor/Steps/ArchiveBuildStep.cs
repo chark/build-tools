@@ -49,7 +49,7 @@ namespace CHARK.BuildTools.Editor.Steps
         [Sirenix.OdinInspector.PropertySpace]
         [Sirenix.OdinInspector.HideIf(nameof(isArchiveAllArtifacts))]
         [Sirenix.OdinInspector.ValueDropdown(
-            nameof(BuildStepNames)
+            nameof(OtherBuildStepNames)
         )]
 #endif
         [SerializeField]
@@ -78,14 +78,19 @@ namespace CHARK.BuildTools.Editor.Steps
             .Distinct()
             .ToList();
 
-        public override void Execute()
+        private IEnumerable<string> OtherBuildStepNames
         {
-            if (isArchiveAllArtifacts)
+            get
             {
-                return;
+                return Context
+                    .BuildSteps
+                    .Where(buildStep => buildStep != this)
+                    .Select(buildStep => buildStep.Name);
             }
+        }
 
-            // TODO: support for archiving into one
+        protected override void OnExecuted()
+        {
             var artifacts = isArchiveAllArtifacts ? Artifacts : GetArtifacts(archiveBuildSteps);
             foreach (var artifact in artifacts)
             {
@@ -98,7 +103,10 @@ namespace CHARK.BuildTools.Editor.Steps
             }
         }
 
-        private void Archive(string sourceDirectoryPath, string destinationFilePath)
+        private void Archive(
+            string sourceDirectoryPath,
+            string destinationFilePath
+        )
         {
             var fastZip = new FastZip
             {
@@ -106,8 +114,13 @@ namespace CHARK.BuildTools.Editor.Steps
                 CompressionLevel = archiveCompressionLevel,
             };
 
-            var directoryFilter = new ArchiveSuffixFilter(ReplaceVariables(ignoreDirectorySuffixes));
-            var fileFilter = new ArchiveSuffixFilter(ReplaceVariables(ignoreFileSuffixes));
+            var directoryFilter = new ArchiveFilter(
+                ignoreNameSuffixes: ReplaceVariables(ignoreDirectorySuffixes)
+            );
+
+            var fileFilter = new ArchiveFilter(
+                ignoreNameSuffixes: ReplaceVariables(ignoreFileSuffixes)
+            );
 
             EditorUtility.DisplayProgressBar(Name, destinationFilePath, 1f);
 
@@ -127,18 +140,18 @@ namespace CHARK.BuildTools.Editor.Steps
             }
         }
 
-        private sealed class ArchiveSuffixFilter : IScanFilter
+        private sealed class ArchiveFilter : IScanFilter
         {
-            private readonly ICollection<string> ignoreDirectorySuffixes;
+            private readonly ICollection<string> ignoreNameSuffixes;
 
-            public ArchiveSuffixFilter(IEnumerable<string> ignoreDirectorySuffixes)
+            public ArchiveFilter(IEnumerable<string> ignoreNameSuffixes)
             {
-                this.ignoreDirectorySuffixes = ignoreDirectorySuffixes.ToList();
+                this.ignoreNameSuffixes = ignoreNameSuffixes.ToList();
             }
 
             public bool IsMatch(string name)
             {
-                foreach (var ignoreDirectorySuffix in ignoreDirectorySuffixes)
+                foreach (var ignoreDirectorySuffix in ignoreNameSuffixes)
                 {
                     if (name.EndsWith(ignoreDirectorySuffix))
                     {

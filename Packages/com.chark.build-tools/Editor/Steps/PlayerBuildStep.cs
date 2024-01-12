@@ -53,7 +53,7 @@ namespace CHARK.BuildTools.Editor.Steps
             "buildTarget",
         };
 
-        public override void Execute()
+        protected override void OnExecuted()
         {
             AddVariable("buildName", Application.productName);
             AddVariable("buildVersion", Application.version);

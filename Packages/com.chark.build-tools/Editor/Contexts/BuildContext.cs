@@ -4,9 +4,9 @@ using System.Linq;
 using CHARK.BuildTools.Editor.Steps;
 using CHARK.BuildTools.Editor.Utilities;
 
-namespace CHARK.BuildTools.Editor
+namespace CHARK.BuildTools.Editor.Contexts
 {
-    internal sealed class BuildContext : ICloneable
+    internal sealed class BuildContext : IBuildContext
     {
         private readonly IDictionary<IBuildStep, IDictionary<string, object>> variables;
         private readonly IDictionary<IBuildStep, IDictionary<string, string>> artifacts;
@@ -14,23 +14,26 @@ namespace CHARK.BuildTools.Editor
 
         public DateTime BuildDateTime { get; }
 
-        public IEnumerable<IBuildStep.Artifact> Artifacts
+        public IEnumerable<IBuildArtifact> Artifacts
         {
             get
             {
+                var result = new List<IBuildArtifact>();
                 foreach (var (buildStep, buildStepArtifacts) in artifacts)
                 {
                     foreach (var (name, path) in buildStepArtifacts)
                     {
-                        var artifact = new IBuildStep.Artifact(
+                        var artifact = new BuildArtifact(
                             buildStep: buildStep,
                             name: name,
                             path: path
                         );
 
-                        yield return artifact;
+                        result.Add(artifact);
                     }
                 }
+
+                return result;
             }
         }
 
@@ -143,16 +146,38 @@ namespace CHARK.BuildTools.Editor
             }
         }
 
-        public IEnumerable<string> GetArtifactPaths(IBuildStep buildStep)
+        public IEnumerable<IBuildArtifact> GetArtifacts(string buildStepName)
+        {
+            if (TryGetBuildStep(buildStepName, out var buildStep) == false)
+            {
+                return Array.Empty<IBuildArtifact>();
+            }
+
+            return buildStep.Artifacts;
+        }
+
+        public IEnumerable<IBuildArtifact> GetArtifacts(IBuildStep buildStep)
         {
             buildStep.AssertNotNull(nameof(buildStep));
 
-            if (artifacts.TryGetValue(buildStep, out var buildStepArtifacts))
+            if (artifacts.TryGetValue(buildStep, out var buildStepArtifacts) == false)
             {
-                return buildStepArtifacts.Values;
+                return Array.Empty<IBuildArtifact>();
             }
 
-            return Array.Empty<string>();
+            var result = new List<IBuildArtifact>();
+            foreach (var (name, path) in buildStepArtifacts)
+            {
+                var artifact = new BuildArtifact(
+                    buildStep: buildStep,
+                    name: name,
+                    path: path
+                );
+
+                result.Add(artifact);
+            }
+
+            return result;
         }
 
         public void AddArtifact(IBuildStep buildStep, string artifactPath)

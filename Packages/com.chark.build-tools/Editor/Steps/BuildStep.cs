@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using CHARK.BuildTools.Editor.Contexts;
 using CHARK.BuildTools.Editor.Utilities;
 using UnityEngine;
 
@@ -22,22 +23,6 @@ namespace CHARK.BuildTools.Editor.Steps
         private string name = Guid.NewGuid().ToString();
 
         public string Name => name;
-
-        public IEnumerable<string> BuildStepNames
-        {
-            get
-            {
-                if (context == default)
-                {
-                    return Array.Empty<string>();
-                }
-
-                return context
-                    .BuildSteps
-                    .Where(buildStep => buildStep != this)
-                    .Select(buildStep => buildStep.Name);
-            }
-        }
 
         /// <summary>
         /// Variables required by this step.
@@ -67,104 +52,131 @@ namespace CHARK.BuildTools.Editor.Steps
 #endif
         protected virtual IEnumerable<string> ProducesVariables { get; } = Array.Empty<string>();
 
-        public IEnumerable<IBuildStep.Artifact> Artifacts
-        {
-            get
-            {
-                if (context == default)
-                {
-                    return Array.Empty<IBuildStep.Artifact>();
-                }
+        public IEnumerable<IBuildArtifact> Artifacts => Context.Artifacts;
 
-                return context.Artifacts;
-            }
+        public DateTime BuildDateTime => Context.BuildDateTime;
+
+        private IBuildContext currentContext = DefaultBuildContext.Instance;
+
+        /// <summary>
+        /// Context currently used by this build step. Never <c>null</c>.
+        /// </summary>
+        internal IBuildContext Context
+        {
+            get => currentContext ?? DefaultBuildContext.Instance;
+            set => currentContext = value ?? DefaultBuildContext.Instance;
         }
 
-        public DateTime BuildDateTime => context?.BuildDateTime ?? DateTime.Now;
-
-        private BuildContext context;
-
-        internal void Initialize(BuildContext buildContext)
+        /// <summary>
+        /// Initialize this build step with a new build context.
+        /// </summary>
+        /// <param name="buildContext"></param>
+        internal void Initialize(IBuildContext buildContext)
         {
-            context = buildContext;
+            Context = buildContext;
         }
 
-        public IEnumerable<IBuildStep> GetBuildSteps(IEnumerable<string> buildStepNames)
+        /// <summary>
+        /// Dispose this build step.
+        /// </summary>
+        internal void Dispose()
         {
-            if (context == default)
-            {
-                yield break;
-            }
+            Context = default;
+        }
 
+        /// <summary>
+        /// Execute this build step.
+        /// </summary>
+        internal void Execute()
+        {
+            OnExecuted();
+        }
+
+        public IEnumerable<string> ReplaceVariables(IEnumerable<string> templates)
+        {
+            return Context.ReplaceVariables(this, templates);
+        }
+
+        public string ReplaceVariables(string template)
+        {
+            return Context.ReplaceVariables(this, template);
+        }
+
+        /// <summary>
+        /// Execute this build step.
+        /// </summary>
+        protected abstract void OnExecuted();
+
+        /// <returns>
+        /// Enumerable of build steps retrieved using given <paramref name="buildStepNames"/>.
+        /// </returns>
+        protected IEnumerable<IBuildStep> GetBuildSteps(IEnumerable<string> buildStepNames)
+        {
             foreach (var buildStepName in buildStepNames)
             {
-                if (context.TryGetBuildStep(buildStepName, out var buildStep))
+                if (Context.TryGetBuildStep(buildStepName, out var buildStep))
                 {
                     yield return buildStep;
                 }
             }
         }
 
-        public IEnumerable<IBuildStep.Artifact> GetArtifacts(IEnumerable<string> buildStepNames)
+        /// <summary>
+        /// Add a new variable with <paramref name="variableValue"/> and
+        /// <paramref name="variableName"/> to this build step.
+        /// </summary>
+        protected void AddVariable(string variableName, object variableValue)
+        {
+            Context.AddVariable(this, variableName, variableValue);
+        }
+
+        /// <summary>
+        /// Add <paramref name="artifactPath"/> with a randomized name to this step.
+        /// </summary>
+        protected void AddArtifact(string artifactPath)
+        {
+            Context.AddArtifact(this, artifactPath);
+        }
+
+        /// <summary>
+        /// Add <paramref name="artifactPath"/> with <paramref name="artifactName"/> to this
+        /// build step.
+        /// </summary>
+        protected void AddArtifact(string artifactName, string artifactPath)
+        {
+            Context.AddArtifact(this, artifactName, artifactPath);
+        }
+
+        /// <returns>
+        /// Enumerable of artifacts from build steps with given <paramref name="buildStepNames"/>.
+        /// </returns>
+        protected IEnumerable<IBuildArtifact> GetArtifacts(IEnumerable<string> buildStepNames)
         {
             return buildStepNames.SelectMany(GetArtifacts).ToList();
         }
 
-        public IEnumerable<IBuildStep.Artifact> GetArtifacts(string buildStepName)
+        /// <returns>
+        /// Enumerable of artifacts from build step with given <paramref name="buildStepName"/>.
+        /// </returns>
+        protected IEnumerable<IBuildArtifact> GetArtifacts(string buildStepName)
         {
-            if (context == default)
-            {
-                return Array.Empty<IBuildStep.Artifact>();
-            }
-
-            if (context.TryGetBuildStep(buildStepName, out var buildStep) == false)
-            {
-                return Array.Empty<IBuildStep.Artifact>();
-            }
-
-            return buildStep.Artifacts;
+            return Context.GetArtifacts(buildStepName);
         }
 
-        public void AddVariable(string variableName, object variableValue)
-        {
-            context?.AddVariable(this, variableName, variableValue);
-        }
-
-        public void AddArtifact(string artifactPath)
-        {
-            AddArtifact(Guid.NewGuid().ToString(), artifactPath);
-        }
-
-        public void AddArtifact(string artifactName, string artifactPath)
-        {
-            context?.AddArtifact(this, artifactName, artifactPath);
-        }
-
-        public IEnumerable<string> ReplaceVariables(IEnumerable<string> templates)
-        {
-            return context?.ReplaceVariables(this, templates) ?? Array.Empty<string>();
-        }
-
-        public string ReplaceVariables(string template)
-        {
-            if (context == default)
-            {
-                return template;
-            }
-
-            return context?.ReplaceVariables(this, template) ?? template;
-        }
-
-        public IEnumerable<string> GetVariableNames(IEnumerable<string> templates, bool isNormalize = true)
+        /// <returns>
+        /// Enumerable of variable names retrieved from given <paramref name="templates"/>.
+        /// </returns>
+        protected IEnumerable<string> GetVariableNames(IEnumerable<string> templates, bool isNormalize = true)
         {
             return templates.GetVariableNames(isNormalize: isNormalize);
         }
 
-        public IEnumerable<string> GetVariableNames(string template, bool isNormalize = true)
+        /// <returns>
+        /// Enumerable of variable names extracted from given <paramref name="template"/>.
+        /// </returns>
+        protected IEnumerable<string> GetVariableNames(string template, bool isNormalize = true)
         {
             return template.GetVariableNames(isNormalize: isNormalize);
         }
-
-        public abstract void Execute();
     }
 }

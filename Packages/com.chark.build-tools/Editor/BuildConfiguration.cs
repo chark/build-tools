@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using CHARK.BuildTools.Editor.Contexts;
 using CHARK.BuildTools.Editor.Steps;
 using CHARK.BuildTools.Editor.Utilities;
 using UnityEngine;
@@ -61,7 +62,7 @@ namespace CHARK.BuildTools.Editor
 
         private void OnDisable()
         {
-            InitializeSteps();
+            DisposeBuildSteps();
         }
 
         /// <summary>
@@ -69,12 +70,15 @@ namespace CHARK.BuildTools.Editor
         /// </summary>
         public void Build()
         {
-            var context = new BuildContext(DateTime.Now, Steps);
-            foreach (var step in Steps)
+            InitializeSteps();
+
+            try
             {
-                Logging.LogDebug($"Executing step: {step.Name}", this);
-                step.Initialize(context);
-                step.Execute();
+                ExecuteBuildSteps();
+            }
+            finally
+            {
+                DisposeBuildSteps();
             }
         }
 
@@ -113,6 +117,23 @@ namespace CHARK.BuildTools.Editor
             foreach (var step in Steps)
             {
                 step.Initialize(context);
+            }
+        }
+
+        private void ExecuteBuildSteps()
+        {
+            foreach (var step in Steps)
+            {
+                Logging.LogDebug($"Executing step: {step.Name}", this);
+                step.Execute();
+            }
+        }
+
+        private void DisposeBuildSteps()
+        {
+            foreach (var step in Steps)
+            {
+                step.Dispose();
             }
         }
     }
