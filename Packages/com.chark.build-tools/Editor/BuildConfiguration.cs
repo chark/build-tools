@@ -124,8 +124,17 @@ namespace CHARK.BuildTools.Editor
         {
             foreach (var step in Steps)
             {
-                Logging.LogDebug($"Executing step: {step.Name}", this);
-                step.Execute();
+                Logging.LogDebug($"Executing build step \"{step.Name}\"", this);
+                try
+                {
+                    step.Execute();
+                    Logging.LogDebug($"Build step \"{step.Name}\" succeeded", this);
+                }
+                catch (Exception exception)
+                {
+                    Logging.LogError($"Build step \"{step.Name}\" failed due to: {exception.Message}", this);
+                    Logging.LogException(exception, this);
+                }
             }
         }
 

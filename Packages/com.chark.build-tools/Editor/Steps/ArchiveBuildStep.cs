@@ -35,12 +35,6 @@ namespace CHARK.BuildTools.Editor.Steps
         [Sirenix.OdinInspector.PropertySpace]
 #endif
         [SerializeField]
-        private bool isCreateSingleArchive;
-
-#if ODIN_INSPECTOR
-        [Sirenix.OdinInspector.FoldoutGroup("Archive", Expanded = true)]
-#endif
-        [SerializeField]
         private bool isArchiveAllArtifacts;
 
 #if ODIN_INSPECTOR
@@ -91,7 +85,7 @@ namespace CHARK.BuildTools.Editor.Steps
 
         protected override void OnExecuted()
         {
-            var artifacts = isArchiveAllArtifacts ? Artifacts : GetArtifacts(archiveBuildSteps);
+            var artifacts = isArchiveAllArtifacts ? Context.Artifacts : GetArtifacts(archiveBuildSteps);
             foreach (var artifact in artifacts)
             {
                 var src = Path.GetDirectoryName(artifact.Path);
@@ -99,7 +93,7 @@ namespace CHARK.BuildTools.Editor.Steps
 
                 Archive(src, dst);
 
-                AddArtifact(src, dst);
+                AddArtifact(dst);
             }
         }
 

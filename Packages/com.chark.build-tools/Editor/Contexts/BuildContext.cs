@@ -221,7 +221,7 @@ namespace CHARK.BuildTools.Editor.Contexts
                     continue;
                 }
 
-                if (TryGetVariable<object>(buildStep, variableName, out var otherValue))
+                if (TryGetVariable<object>(otherBuildStep, variableName, out var otherValue))
                 {
                     return otherValue.ToString();
                 }

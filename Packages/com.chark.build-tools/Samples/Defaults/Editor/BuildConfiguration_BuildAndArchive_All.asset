@@ -34,18 +34,18 @@ MonoBehaviour:
         name: Build Android
         buildTarget: 13
         buildOptions: 0
-        buildPath: Builds/{buildTarget}-{buildVersion}-{buildDate}/{buildName}.exe
+        buildPath: Builds/{buildTarget}-{buildVersion}-{buildDate}/{buildName}.apk
         dateTimeFormat: yyyyMMHHmmss
     - rid: 8175428866849112067
       type: {class: ArchiveBuildStep, ns: CHARK.BuildTools.Editor.Steps, asm: CHARK.BuildTools.Editor}
       data:
         name: Archive All
         archiveCompressionLevel: 9
-        archivePath: Builds/{buildName}-{buildTarget}-{buildVersion}.zip
-        isCreateSingleArchive: 0
-        isArchiveAllArtifacts: 0
+        archivePath: Builds/{buildTarget}-{buildVersion}-{buildDate}.zip
+        isArchiveAllArtifacts: 1
         archiveBuildSteps:
         - Build Windows
+        - Build Android
         ignoreDirectorySuffixes:
         - _BurstDebugInformation_DoNotShip
         ignoreFileSuffixes: []

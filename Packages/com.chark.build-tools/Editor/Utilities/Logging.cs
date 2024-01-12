@@ -13,11 +13,11 @@ namespace CHARK.BuildTools.Editor.Utilities
         {
             if (Application.isBatchMode)
             {
-                Debug.Log($"[{owner.Name}]: {message}");
+                Debug.Log($"[{owner.Name}] {message}");
             }
             else
             {
-                Debug.Log($"[<b><color=cyan>{owner.Name}</color></b>]: {message}");
+                Debug.Log($"[<b><color=cyan>{owner.Name}</color></b>] {message}");
             }
         }
 
@@ -29,11 +29,11 @@ namespace CHARK.BuildTools.Editor.Utilities
 
             if (Application.isBatchMode)
             {
-                Debug.Log($"[{name}]: {message}", owner);
+                Debug.Log($"[{name}] {message}", owner);
             }
             else
             {
-                Debug.Log($"[<b><color=cyan>{name}</color></b>]: {message}", owner);
+                Debug.Log($"[<b><color=cyan>{name}</color></b>] {message}", owner);
             }
         }
 
@@ -41,11 +41,11 @@ namespace CHARK.BuildTools.Editor.Utilities
         {
             if (Application.isBatchMode)
             {
-                Debug.LogWarning($"[{owner.Name}]: {message}");
+                Debug.LogWarning($"[{owner.Name}] {message}");
             }
             else
             {
-                Debug.LogWarning($"[<b><color=yellow>{owner.Name}</color></b>]: {message}");
+                Debug.LogWarning($"[<b><color=yellow>{owner.Name}</color></b>] {message}");
             }
         }
 
@@ -57,11 +57,11 @@ namespace CHARK.BuildTools.Editor.Utilities
 
             if (Application.isBatchMode)
             {
-                Debug.LogWarning($"[{name}]: {message}", owner);
+                Debug.LogWarning($"[{name}] {message}", owner);
             }
             else
             {
-                Debug.LogWarning($"[<b><color=yellow>{name}</color></b>]: {message}", owner);
+                Debug.LogWarning($"[<b><color=yellow>{name}</color></b>] {message}", owner);
             }
         }
 
@@ -69,11 +69,11 @@ namespace CHARK.BuildTools.Editor.Utilities
         {
             if (Application.isBatchMode)
             {
-                Debug.LogError($"[{owner.Name}]: {message}");
+                Debug.LogError($"[{owner.Name}] {message}");
             }
             else
             {
-                Debug.LogError($"[<b><color=red>{owner.Name}</color></b>]: {message}");
+                Debug.LogError($"[<b><color=red>{owner.Name}</color></b>] {message}");
             }
         }
 
@@ -85,11 +85,11 @@ namespace CHARK.BuildTools.Editor.Utilities
 
             if (Application.isBatchMode)
             {
-                Debug.LogError($"[{name}]: {message}", owner);
+                Debug.LogError($"[{name}] {message}", owner);
             }
             else
             {
-                Debug.LogError($"[<b><color=red>{name}</color></b>]: {message}", owner);
+                Debug.LogError($"[<b><color=red>{name}</color></b>] {message}", owner);
             }
         }
 

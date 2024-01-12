@@ -52,7 +52,7 @@ namespace CHARK.BuildTools.Editor.Steps
 #endif
         protected virtual IEnumerable<string> ProducesVariables { get; } = Array.Empty<string>();
 
-        public IEnumerable<IBuildArtifact> Artifacts => Context.Artifacts;
+        public IEnumerable<IBuildArtifact> Artifacts => Context.GetArtifacts(this);
 
         public DateTime BuildDateTime => Context.BuildDateTime;
 
