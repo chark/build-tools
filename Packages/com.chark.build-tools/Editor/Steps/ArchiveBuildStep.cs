@@ -25,20 +25,35 @@ namespace CHARK.BuildTools.Editor.Steps
 #if ODIN_INSPECTOR
         [Sirenix.OdinInspector.FoldoutGroup("Archive", Expanded = true)]
         [Sirenix.OdinInspector.Required]
+        [Sirenix.OdinInspector.FolderPath]
+#endif
+        [SerializeField]
+        private string archivePath = "Builds/{buildTarget}-{buildVersion}-{buildDate}.zip";
+
+#if ODIN_INSPECTOR
+        [Sirenix.OdinInspector.FoldoutGroup("Archive", Expanded = true)]
+        [Sirenix.OdinInspector.PropertySpace]
+#endif
+        [SerializeField]
+        private bool isCreateSingleArchive;
+
+#if ODIN_INSPECTOR
+        [Sirenix.OdinInspector.FoldoutGroup("Archive", Expanded = true)]
+#endif
+        [SerializeField]
+        private bool isArchiveAllArtifacts;
+
+#if ODIN_INSPECTOR
+        [Sirenix.OdinInspector.FoldoutGroup("Archive", Expanded = true)]
+        [Sirenix.OdinInspector.Required]
+        [Sirenix.OdinInspector.PropertySpace]
+        [Sirenix.OdinInspector.HideIf(nameof(isArchiveAllArtifacts))]
         [Sirenix.OdinInspector.ValueDropdown(
             nameof(BuildStepNames)
         )]
 #endif
         [SerializeField]
-        private List<string> archiveBuildStepNames = new();
-
-#if ODIN_INSPECTOR
-        [Sirenix.OdinInspector.FoldoutGroup("Archive", Expanded = true)]
-        [Sirenix.OdinInspector.Required]
-        [Sirenix.OdinInspector.FolderPath]
-#endif
-        [SerializeField]
-        private string archivePath = "Builds/{buildTarget}-{buildVersion}-{buildDate}.zip";
+        private List<string> archiveBuildSteps = new();
 
 #if ODIN_INSPECTOR
         [Sirenix.OdinInspector.FoldoutGroup("Filtering", Expanded = true)]
@@ -65,13 +80,17 @@ namespace CHARK.BuildTools.Editor.Steps
 
         public override void Execute()
         {
-            // TODO: get build step for each build step name
-            // TODO: replace variables using that build step (prolly need to relax replacement)
-            var artifacts = GetArtifactPaths(Array.Empty<IBuildStep>()).ToList(); // TODO: names
-            foreach (var path in artifacts)
+            if (isArchiveAllArtifacts)
             {
-                var src = Path.GetDirectoryName(path);
-                var dst = ReplaceVariables(archivePath);
+                return;
+            }
+
+            // TODO: support for archiving into one
+            var artifacts = isArchiveAllArtifacts ? Artifacts : GetArtifacts(archiveBuildSteps);
+            foreach (var artifact in artifacts)
+            {
+                var src = Path.GetDirectoryName(artifact.Path);
+                var dst = artifact.BuildStep.ReplaceVariables(archivePath);
 
                 Archive(src, dst);
 

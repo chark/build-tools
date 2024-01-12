@@ -14,6 +14,38 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   configurationName: Build & Archive All
   steps:
-  - {fileID: 11400000, guid: 860e727850b0fc540b61c3290b1e10b1, type: 2}
-  - {fileID: 11400000, guid: 9d0a0e8cb7475944783dead18a44129d, type: 2}
-  - {fileID: 11400000, guid: 4f1662ce40a8549448be99cbdd3923b8, type: 2}
+  - rid: 8175428866849112064
+  - rid: 8175428866849112066
+  - rid: 8175428866849112067
+  references:
+    version: 2
+    RefIds:
+    - rid: 8175428866849112064
+      type: {class: PlayerBuildStep, ns: CHARK.BuildTools.Editor.Steps, asm: CHARK.BuildTools.Editor}
+      data:
+        name: Build Windows
+        buildTarget: 19
+        buildOptions: 0
+        buildPath: Builds/{buildTarget}-{buildVersion}-{buildDate}/{buildName}.exe
+        dateTimeFormat: yyyyMMHHmmss
+    - rid: 8175428866849112066
+      type: {class: PlayerBuildStep, ns: CHARK.BuildTools.Editor.Steps, asm: CHARK.BuildTools.Editor}
+      data:
+        name: Build Android
+        buildTarget: 13
+        buildOptions: 0
+        buildPath: Builds/{buildTarget}-{buildVersion}-{buildDate}/{buildName}.exe
+        dateTimeFormat: yyyyMMHHmmss
+    - rid: 8175428866849112067
+      type: {class: ArchiveBuildStep, ns: CHARK.BuildTools.Editor.Steps, asm: CHARK.BuildTools.Editor}
+      data:
+        name: Archive All
+        archiveCompressionLevel: 9
+        archivePath: Builds/{buildName}-{buildTarget}-{buildVersion}.zip
+        isCreateSingleArchive: 0
+        isArchiveAllArtifacts: 0
+        archiveBuildSteps:
+        - Build Windows
+        ignoreDirectorySuffixes:
+        - _BurstDebugInformation_DoNotShip
+        ignoreFileSuffixes: []

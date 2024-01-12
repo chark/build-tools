@@ -8,16 +8,36 @@ namespace CHARK.BuildTools.Editor
 {
     internal sealed class BuildContext : ICloneable
     {
-        private readonly IDictionary<string, object> variables;
+        private readonly IDictionary<IBuildStep, IDictionary<string, object>> variables;
         private readonly IDictionary<IBuildStep, IDictionary<string, string>> artifacts;
         private readonly ICollection<IBuildStep> buildSteps;
 
         public DateTime BuildDateTime { get; }
 
+        public IEnumerable<IBuildStep.Artifact> Artifacts
+        {
+            get
+            {
+                foreach (var (buildStep, buildStepArtifacts) in artifacts)
+                {
+                    foreach (var (name, path) in buildStepArtifacts)
+                    {
+                        var artifact = new IBuildStep.Artifact(
+                            buildStep: buildStep,
+                            name: name,
+                            path: path
+                        );
+
+                        yield return artifact;
+                    }
+                }
+            }
+        }
+
         public IEnumerable<IBuildStep> BuildSteps => buildSteps;
 
         public BuildContext(DateTime buildDateTime, IEnumerable<IBuildStep> buildSteps) : this(
-            variables: new Dictionary<string, object>(),
+            variables: new Dictionary<IBuildStep, IDictionary<string, object>>(),
             artifacts: new Dictionary<IBuildStep, IDictionary<string, string>>(),
             buildSteps: buildSteps.ToList(),
             buildDateTime: buildDateTime
@@ -26,7 +46,7 @@ namespace CHARK.BuildTools.Editor
         }
 
         public BuildContext(
-            IDictionary<string, object> variables,
+            IDictionary<IBuildStep, IDictionary<string, object>> variables,
             IDictionary<IBuildStep, IDictionary<string, string>> artifacts,
             IEnumerable<IBuildStep> buildSteps,
             DateTime buildDateTime
@@ -38,35 +58,29 @@ namespace CHARK.BuildTools.Editor
             this.buildSteps = buildSteps.ToList();
         }
 
-        public IEnumerable<string> ReplaceVariables(IEnumerable<string> templates)
+        public IEnumerable<string> ReplaceVariables(IBuildStep buildStep, IEnumerable<string> templates)
         {
-            return templates.ReplaceVariables(GetVariableValue);
+            return templates.ReplaceVariables(GetValue);
 
-            string GetVariableValue(string variableName)
+            string GetValue(string variableName)
             {
-                return GetVariable<object>(variableName).ToString();
+                return GetVariableValue(buildStep, variableName);
             }
         }
 
-        public string ReplaceVariables(string template)
+        public string ReplaceVariables(IBuildStep buildStep, string template)
         {
-            return template.ReplaceVariables(GetVariableValue);
+            return template.ReplaceVariables(GetValue);
 
-            string GetVariableValue(string variableName)
+            string GetValue(string variableName)
             {
-                return GetVariable<object>(variableName).ToString();
+                return GetVariableValue(buildStep, variableName);
             }
         }
 
         public bool TryGetBuildStep(string buildStepName, out IBuildStep buildStep)
         {
-            if (string.IsNullOrWhiteSpace(buildStepName))
-            {
-                throw new ArgumentException(
-                    $"{nameof(buildStepName)} cannot be blank or null",
-                    nameof(buildStepName)
-                );
-            }
+            buildStepName.AssertNotBlank(nameof(buildStepName));
 
             foreach (var otherBuildStep in buildSteps)
             {
@@ -81,28 +95,19 @@ namespace CHARK.BuildTools.Editor
             return false;
         }
 
-        public T GetVariable<T>(string variableName)
+        public bool TryGetVariable<T>(IBuildStep buildStep, string variableName, out T value)
         {
-            if (TryGetVariable<T>(variableName, out var value) == false)
-            {
-                throw new Exception($"Variable {variableName} is not added to build context");
-            }
+            buildStep.AssertNotNull(nameof(buildStep));
+            variableName.AssertNotBlank(nameof(variableName));
 
-            return value;
-        }
-
-        public bool TryGetVariable<T>(string variableName, out T value)
-        {
-            if (string.IsNullOrWhiteSpace(variableName))
+            if (variables.TryGetValue(buildStep, out var buildStepVariables) == false)
             {
-                throw new ArgumentException(
-                    $"{nameof(variableName)} cannot be blank or null",
-                    nameof(variableName)
-                );
+                value = default;
+                return false;
             }
 
             var normalizedName = GetNormalizedName(variableName);
-            if (variables.TryGetValue(normalizedName, out var rawValue) == false)
+            if (buildStepVariables.TryGetValue(normalizedName, out var rawValue) == false)
             {
                 value = default;
                 return false;
@@ -118,15 +123,29 @@ namespace CHARK.BuildTools.Editor
             return true;
         }
 
+        public void AddVariable(IBuildStep buildStep, string variableName, object variableValue)
+        {
+            buildStep.AssertNotNull(nameof(buildStep));
+            variableName.AssertNotBlank(nameof(variableName));
+            variableValue.AssertNotNull(nameof(variableValue));
+
+            var normalizedName = GetNormalizedName(variableName);
+            if (variables.TryGetValue(buildStep, out var buildStepVariables))
+            {
+                buildStepVariables[normalizedName] = variableValue;
+            }
+            else
+            {
+                variables[buildStep] = new Dictionary<string, object>
+                {
+                    { normalizedName, variableValue },
+                };
+            }
+        }
+
         public IEnumerable<string> GetArtifactPaths(IBuildStep buildStep)
         {
-            if (buildStep == default)
-            {
-                throw new ArgumentException(
-                    $"{nameof(buildStep)} cannot be null",
-                    nameof(buildStep)
-                );
-            }
+            buildStep.AssertNotNull(nameof(buildStep));
 
             if (artifacts.TryGetValue(buildStep, out var buildStepArtifacts))
             {
@@ -136,28 +155,6 @@ namespace CHARK.BuildTools.Editor
             return Array.Empty<string>();
         }
 
-        public void AddVariable(string variableName, object variableValue)
-        {
-            if (string.IsNullOrWhiteSpace(variableName))
-            {
-                throw new ArgumentException(
-                    $"{nameof(variableName)} cannot be blank or null",
-                    nameof(variableName)
-                );
-            }
-
-            if (variableValue == default)
-            {
-                throw new ArgumentException(
-                    $"{nameof(variableValue)} cannot be null",
-                    nameof(variableValue)
-                );
-            }
-
-            var normalizedName = GetNormalizedName(variableName);
-            variables[normalizedName] = variableValue;
-        }
-
         public void AddArtifact(IBuildStep buildStep, string artifactPath)
         {
             AddArtifact(buildStep, Guid.NewGuid().ToString(), artifactPath);
@@ -165,21 +162,9 @@ namespace CHARK.BuildTools.Editor
 
         public void AddArtifact(IBuildStep buildStep, string artifactName, string artifactPath)
         {
-            if (string.IsNullOrWhiteSpace(artifactName))
-            {
-                throw new ArgumentException(
-                    $"{nameof(artifactName)} cannot be blank or null",
-                    nameof(artifactName)
-                );
-            }
-
-            if (string.IsNullOrWhiteSpace(artifactPath))
-            {
-                throw new ArgumentException(
-                    $"{nameof(artifactPath)} cannot be blank or null",
-                    nameof(artifactPath)
-                );
-            }
+            buildStep.AssertNotNull(nameof(buildStep));
+            artifactName.AssertNotBlank(nameof(artifactName));
+            artifactPath.AssertNotBlank(nameof(artifactPath));
 
             var normalizedName = GetNormalizedName(artifactName);
             var normalizedPath = GetNormalizedPath(artifactPath);
@@ -197,6 +182,29 @@ namespace CHARK.BuildTools.Editor
             }
         }
 
+        private string GetVariableValue(IBuildStep buildStep, string variableName)
+        {
+            if (TryGetVariable<object>(buildStep, variableName, out var value))
+            {
+                return value.ToString();
+            }
+
+            foreach (var otherBuildStep in buildSteps)
+            {
+                if (otherBuildStep == buildStep)
+                {
+                    continue;
+                }
+
+                if (TryGetVariable<object>(buildStep, variableName, out var otherValue))
+                {
+                    return otherValue.ToString();
+                }
+            }
+
+            return string.Empty;
+        }
+
         private static string GetNormalizedName(string name)
         {
             return name.Trim().ToLower();
@@ -210,7 +218,7 @@ namespace CHARK.BuildTools.Editor
         public object Clone()
         {
             var context = new BuildContext(
-                variables: new Dictionary<string, object>(variables),
+                variables: new Dictionary<IBuildStep, IDictionary<string, object>>(variables),
                 artifacts: new Dictionary<IBuildStep, IDictionary<string, string>>(artifacts),
                 buildSteps: buildSteps,
                 buildDateTime: BuildDateTime

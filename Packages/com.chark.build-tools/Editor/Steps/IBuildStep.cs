@@ -5,6 +5,27 @@ namespace CHARK.BuildTools.Editor.Steps
 {
     public interface IBuildStep
     {
+        public readonly struct Artifact
+        {
+            public IBuildStep BuildStep { get; }
+
+            public string Name { get; }
+
+            public string Path { get; }
+
+            public Artifact(IBuildStep buildStep, string name, string path)
+            {
+                BuildStep = buildStep;
+                Name = name;
+                Path = path;
+            }
+        }
+
+        /// <summary>
+        /// Enumerable of all artifact paths from all build steps.
+        /// </summary>
+        public IEnumerable<Artifact> Artifacts { get; }
+
         /// <summary>
         /// Date time when this build was started.
         /// </summary>
@@ -41,14 +62,14 @@ namespace CHARK.BuildTools.Editor.Steps
         public string ReplaceVariables(string template);
 
         /// <returns>
-        /// Enumerable of paths from given <paramref name="buildSteps"/>.
+        /// Enumerable of paths from build steps with given <paramref name="buildStepNames"/>.
         /// </returns>
-        public IEnumerable<string> GetArtifactPaths(IEnumerable<IBuildStep> buildSteps);
+        public IEnumerable<Artifact> GetArtifacts(IEnumerable<string> buildStepNames);
 
         /// <returns>
-        /// Enumerable of paths from given <paramref name="buildStep"/>.
+        /// Enumerable of paths from build step with given <paramref name="buildStepName"/>.
         /// </returns>
-        public IEnumerable<string> GetArtifactPaths(IBuildStep buildStep);
+        public IEnumerable<Artifact> GetArtifacts(string buildStepName);
 
         /// <summary>
         /// Add build variable.

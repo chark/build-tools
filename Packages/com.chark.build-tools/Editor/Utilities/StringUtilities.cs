@@ -85,6 +85,10 @@ namespace CHARK.BuildTools.Editor.Utilities
             foreach (var variableName in GetVariableNames(template))
             {
                 var value = variableProvider(variableName);
+                if (string.IsNullOrWhiteSpace(value))
+                {
+                    continue;
+                }
 
                 result = result.Replace(
                     $"{{{variableName}}}",

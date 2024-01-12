@@ -14,4 +14,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   configurationName: Build & Run Android
   steps:
-  - {fileID: 11400000, guid: bd71f5e01370ee0409f09c723166d6f2, type: 2}
+  - rid: 8175428883862781952
+  references:
+    version: 2
+    RefIds:
+    - rid: 8175428883862781952
+      type: {class: PlayerBuildStep, ns: CHARK.BuildTools.Editor.Steps, asm: CHARK.BuildTools.Editor}
+      data:
+        name: Android
+        buildTarget: 13
+        buildOptions: 12
+        buildPath: Builds/{buildTarget}-{buildVersion}-{buildDate}/{buildName}.exe
+        dateTimeFormat: yyyyMMHHmmss

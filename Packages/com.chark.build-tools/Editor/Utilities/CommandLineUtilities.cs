@@ -16,13 +16,7 @@ namespace CHARK.BuildTools.Editor.Utilities
 
             public bool TryGetValue(string key, out string value)
             {
-                if (string.IsNullOrWhiteSpace(key))
-                {
-                    throw new ArgumentException(
-                        $"{key} cannot be null or blank",
-                        nameof(key)
-                    );
-                }
+                key.AssertNotBlank(nameof(key));
 
                 var normalizedKey = key.Trim().ToLower();
                 return arguments.TryGetValue(normalizedKey, out value);

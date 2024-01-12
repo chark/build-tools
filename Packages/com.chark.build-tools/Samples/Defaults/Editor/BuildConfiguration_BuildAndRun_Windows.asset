@@ -14,4 +14,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   configurationName: Build & Run Windows
   steps:
-  - {fileID: 11400000, guid: a91b85626a4a2314b8141ed71404f1f4, type: 2}
+  - rid: 8175428883862781953
+  references:
+    version: 2
+    RefIds:
+    - rid: 8175428883862781953
+      type: {class: PlayerBuildStep, ns: CHARK.BuildTools.Editor.Steps, asm: CHARK.BuildTools.Editor}
+      data:
+        name: Windows
+        buildTarget: 19
+        buildOptions: 12
+        buildPath: Builds/{buildTarget}-{buildVersion}-{buildDate}/{buildName}.exe
+        dateTimeFormat: yyyyMMHHmmss

@@ -67,6 +67,19 @@ namespace CHARK.BuildTools.Editor.Steps
 #endif
         protected virtual IEnumerable<string> ProducesVariables { get; } = Array.Empty<string>();
 
+        public IEnumerable<IBuildStep.Artifact> Artifacts
+        {
+            get
+            {
+                if (context == default)
+                {
+                    return Array.Empty<IBuildStep.Artifact>();
+                }
+
+                return context.Artifacts;
+            }
+        }
+
         public DateTime BuildDateTime => context?.BuildDateTime ?? DateTime.Now;
 
         private BuildContext context;
@@ -92,19 +105,29 @@ namespace CHARK.BuildTools.Editor.Steps
             }
         }
 
-        public IEnumerable<string> GetArtifactPaths(IEnumerable<IBuildStep> buildSteps)
+        public IEnumerable<IBuildStep.Artifact> GetArtifacts(IEnumerable<string> buildStepNames)
         {
-            return buildSteps.SelectMany(GetArtifactPaths);
+            return buildStepNames.SelectMany(GetArtifacts).ToList();
         }
 
-        public IEnumerable<string> GetArtifactPaths(IBuildStep buildStep)
+        public IEnumerable<IBuildStep.Artifact> GetArtifacts(string buildStepName)
         {
-            return context?.GetArtifactPaths(buildStep) ?? Array.Empty<string>();
+            if (context == default)
+            {
+                return Array.Empty<IBuildStep.Artifact>();
+            }
+
+            if (context.TryGetBuildStep(buildStepName, out var buildStep) == false)
+            {
+                return Array.Empty<IBuildStep.Artifact>();
+            }
+
+            return buildStep.Artifacts;
         }
 
         public void AddVariable(string variableName, object variableValue)
         {
-            context?.AddVariable(variableName, variableValue);
+            context?.AddVariable(this, variableName, variableValue);
         }
 
         public void AddArtifact(string artifactPath)
@@ -119,12 +142,17 @@ namespace CHARK.BuildTools.Editor.Steps
 
         public IEnumerable<string> ReplaceVariables(IEnumerable<string> templates)
         {
-            return context?.ReplaceVariables(templates) ?? Array.Empty<string>();
+            return context?.ReplaceVariables(this, templates) ?? Array.Empty<string>();
         }
 
         public string ReplaceVariables(string template)
         {
-            return context?.ReplaceVariables(template) ?? template;
+            if (context == default)
+            {
+                return template;
+            }
+
+            return context?.ReplaceVariables(this, template) ?? template;
         }
 
         public IEnumerable<string> GetVariableNames(IEnumerable<string> templates, bool isNormalize = true)
