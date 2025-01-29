@@ -161,8 +161,11 @@ namespace CHARK.BuildTools.Editor
             }
 
             var buildFileExtension = GetFileExtension(buildOptions.BuildTarget);
-            var buildFileName = $"{string.Join(settings.BuildNameDelimiter, parts)}." +
-                                $"{buildFileExtension}";
+            var buildFileName = $"{string.Join(settings.BuildNameDelimiter, parts)}";
+            if (string.IsNullOrWhiteSpace(buildFileExtension) == false)
+            {
+                buildFileName = $".{buildFileExtension}";
+            }
 
             var buildDirectory = settings.BuildDirectory;
 
@@ -228,7 +231,7 @@ namespace CHARK.BuildTools.Editor
                 BuildToolsTarget.StandaloneLinux64 => "x86_64",
                 BuildToolsTarget.StandaloneOSX => "app",
                 BuildToolsTarget.iOS => "ipa",
-                BuildToolsTarget.WebGL => "html",
+                BuildToolsTarget.WebGL => "",
                 _ => throw new Exception($"Unsupported target: {target}"),
             };
         }
