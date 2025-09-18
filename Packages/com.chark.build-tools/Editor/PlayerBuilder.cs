@@ -16,7 +16,12 @@ namespace CHARK.BuildTools.Editor
         private const Deflater.CompressionLevel ArchiveCompressionLevel =
             Deflater.CompressionLevel.BEST_COMPRESSION;
 
-        private const string BurstDebugInformationDirectorySuffix = "_BurstDebugInformation_DoNotShip";
+        private static readonly IReadOnlyList<string> BuildDebugInformationDirectorySuffixes = new List<string>
+        {
+            "_BurstDebugInformation_DoNotShip",
+            "_BackUpThisFolder_ButDontShipItWithYourGame",
+        };
+
         private const string BuildArchiveExtension = "zip";
 
         /// <summary>
@@ -285,7 +290,15 @@ namespace CHARK.BuildTools.Editor
         {
             public bool IsMatch(string name)
             {
-                return name.EndsWith(BurstDebugInformationDirectorySuffix) == false;
+                foreach (var suffix in BuildDebugInformationDirectorySuffixes)
+                {
+                    if (name.EndsWith(suffix))
+                    {
+                        return false;
+                    }
+                }
+
+                return true;
             }
         }
     }
